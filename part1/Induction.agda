@@ -39,3 +39,16 @@ _ =
   ≡⟨ cong suc (+-identityʳ m) ⟩
       suc m
   ∎
+
++-suc : ∀ (m n : ℕ) → m + suc n ≡ suc (m + n)
++-suc zero n =
+  begin zero + suc n
+  ≡⟨⟩   suc n
+  ∎
++-suc (suc m) n =
+  begin suc m + suc n
+  ≡⟨⟩   suc (m + suc n)
+  ≡⟨ cong suc (+-suc m n) ⟩
+        suc (suc (m + n))
+  ≡⟨⟩   suc (suc m + n)
+  ∎
