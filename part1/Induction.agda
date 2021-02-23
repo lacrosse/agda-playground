@@ -30,3 +30,12 @@ _ =
         suc (m + (n + p))
   ≡⟨⟩   suc m + (n + p)
   ∎
+
++-identityʳ : ∀ (m : ℕ) → m + zero ≡ m
++-identityʳ zero = begin zero + zero ≡⟨⟩ zero ∎
++-identityʳ (suc m) =
+  begin (suc m) + zero
+  ≡⟨⟩ suc (m + zero)
+  ≡⟨ cong suc (+-identityʳ m) ⟩
+      suc m
+  ∎
