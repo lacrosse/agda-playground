@@ -89,3 +89,21 @@ _ =
   rewrite +-suc′ m n
         | +-comm′ m n
   = refl
+
++-rearrange : ∀ (m n p q : ℕ) → (m + n) + (p + q) ≡ m + (n + p) + q
++-rearrange m n p q =
+  begin (m + n) + (p + q)
+  ≡⟨ +-assoc m n (p + q) ⟩
+        m + (n + (p + q))
+  ≡⟨ cong (m +_) (sym (+-assoc n p q)) ⟩
+        m + (n + p + q)
+  ≡⟨ sym (+-assoc m (n + p) q) ⟩
+        m + (n + p) + q
+  ∎
+
++-swap : ∀ (m n p : ℕ) → m + (n + p) ≡ n + (m + p)
++-swap m n p
+  rewrite +-comm m (n + p)
+        | +-assoc n p m
+        | +-comm p m
+  = refl
