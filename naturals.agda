@@ -12,8 +12,8 @@ open Eq using (_≡_; refl)
 open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; _∎)
 
 _+_ : ℕ → ℕ → ℕ
-zero    + n = n
-(suc m) + n = suc (m + n)
+zero  + n = n
+suc m + n = suc (m + n)
 
 _ : 2 + 3 ≡ 5
 _ = refl
@@ -106,3 +106,38 @@ _ =
 
 infixl 6 _+_ _∸_
 infixl 7 _*_
+
+{-# BUILTIN NATPLUS _+_ #-}
+{-# BUILTIN NATTIMES _*_ #-}
+{-# BUILTIN NATMINUS _∸_ #-}
+
+-- Bin
+
+data Bin : Set where
+  ⟨⟩ : Bin
+  _O : Bin → Bin
+  _I : Bin → Bin
+
+inc : Bin → Bin
+inc ⟨⟩ = ⟨⟩ I
+inc (bin O) = bin I
+inc (bin I) = (inc bin) O
+
+_ = inc (⟨⟩ I O I I) ≡⟨⟩ ⟨⟩ I I O O ∎
+_ = inc (⟨⟩ I O I O) ≡⟨⟩ ⟨⟩ I O I I ∎
+_ = inc (⟨⟩ I I I I) ≡⟨⟩ ⟨⟩ I O O O O ∎
+
+to : ℕ → Bin
+to zero = ⟨⟩ O
+to (suc n) = inc (to n)
+
+_ = to 1 ≡⟨⟩ ⟨⟩ I ∎
+_ = to 93 ≡⟨⟩ ⟨⟩ I O I I I O I ∎
+
+from : Bin → ℕ
+from ⟨⟩ = 0
+from (bin O) = 2 * from bin
+from (bin I) = 2 * from bin + 1
+
+_ = from (⟨⟩ O O O O) ≡⟨⟩ 0 ∎
+_ = from (⟨⟩ I O I I I O I) ≡⟨⟩ 93 ∎
