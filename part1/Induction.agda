@@ -107,3 +107,19 @@ _ =
         | +-assoc n p m
         | +-comm p m
   = refl
+
+*-identityʳ : ∀ (n : ℕ) → n * zero ≡ zero
+*-identityʳ zero = refl
+*-identityʳ (suc n) rewrite *-identityʳ n = refl
+
+*-distrib-+ : ∀ (m n p : ℕ) → (m + n) * p ≡ m * p + n * p
+*-distrib-+ m zero p
+  rewrite *-identityʳ p
+        | +-identityʳ m
+        | +-identityʳ (m * p)
+  = refl
+*-distrib-+ m (suc n) p
+  rewrite +-suc m n
+        | *-distrib-+ m n p
+        | +-swap p (m * p) (n * p)
+  = refl
