@@ -177,3 +177,14 @@ _ =
   rewrite ^-distribˡ-|-* m n p
         | *-assoc m (m ^ n) (m ^ p)
   = refl
+
+^-distribʳ-* : ∀ (m n p : ℕ) → (m * n) ^ p ≡ (m ^ p) * (n ^ p)
+^-distribʳ-* m n zero = refl
+^-distribʳ-* m n (suc p)
+  rewrite ^-distribʳ-* m n p
+        | *-assoc m (m ^ p) (n * (n ^ p))
+        | *-assoc m n (m ^ p * (n ^ p))
+        | sym (*-assoc n (m ^ p) (n ^ p))
+        | sym (*-assoc (m ^ p) n (n ^ p))
+        | *-comm n (m ^ p)
+  = refl
