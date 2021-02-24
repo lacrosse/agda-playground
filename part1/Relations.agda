@@ -108,3 +108,11 @@ data _<_ : ℕ → ℕ → Set where
 <-trans : ∀ {m n p : ℕ} → m < n → n < p → m < p
 <-trans 0<s (s<s h) = 0<s
 <-trans (s<s h1) (s<s h2) = s<s (<-trans h1 h2)
+
+_>_ : ℕ → ℕ → Set
+m > n = n < m
+
+data Trichotomy (m n : ℕ) : Set where
+  tri_fwd : m < n → Trichotomy m n
+  tri_eq : m ≡ n → Trichotomy m n
+  tri_bck : m > n → Trichotomy m n
