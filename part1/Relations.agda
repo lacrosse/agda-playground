@@ -98,3 +98,13 @@ data Total (m n : ℕ) : Set where
 
 *-mono-≤ : ∀ (m n p q : ℕ) → m ≤ n → p ≤ q → m * p ≤ n * q
 *-mono-≤ m n p q h1 h2 = ≤-trans (*-monoʳ-≤ m p q h2) (*-monoˡ-≤ q m n h1)
+
+infix 4 _<_
+
+data _<_ : ℕ → ℕ → Set where
+  0<s : ∀ {n : ℕ} → zero < suc n
+  s<s : ∀ {m n : ℕ} → m < n → suc m < suc n
+
+<-trans : ∀ {m n p : ℕ} → m < n → n < p → m < p
+<-trans 0<s (s<s h) = 0<s
+<-trans (s<s h1) (s<s h2) = s<s (<-trans h1 h2)
