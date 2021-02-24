@@ -139,7 +139,7 @@ _ = to 93 ≡⟨⟩ ⟨⟩ I O I I I O I ∎
 from : Bin → ℕ
 from ⟨⟩ = 0
 from (bin O) = 2 * from bin
-from (bin I) = 2 * from bin + 1
+from (bin I) = suc (2 * from bin)
 
 _ = from (⟨⟩ O O O O) ≡⟨⟩ 0 ∎
 _ = from (⟨⟩ I O I I I O I) ≡⟨⟩ 93 ∎

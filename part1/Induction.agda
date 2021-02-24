@@ -203,3 +203,49 @@ _ =
         | ^-distribˡ-|-* m p (n * p)
         | ^-*-assoc m n p
   = refl
+
+-- Bin-laws
+
+data Bin : Set where
+  ⟨⟩ : Bin
+  _O : Bin → Bin
+  _I : Bin → Bin
+
+inc : Bin → Bin
+inc ⟨⟩ = ⟨⟩ I
+inc (bin O) = bin I
+inc (bin I) = (inc bin) O
+
+to : ℕ → Bin
+to zero = ⟨⟩ O
+to (suc n) = inc (to n)
+
+from : Bin → ℕ
+from ⟨⟩ = 0
+from (bin O) = 2 * from bin
+from (bin I) = suc (2 * from bin)
+
+from-inc-≡-suc-from : ∀ (b : Bin) → from (inc b) ≡ suc (from b)
+from-inc-≡-suc-from ⟨⟩ = refl
+from-inc-≡-suc-from (b O) = refl
+from-inc-≡-suc-from (b I)
+  rewrite +-identityʳ (from (inc b))
+        | +-identityʳ (from b)
+        | from-inc-≡-suc-from b
+        | +-suc (from b) (suc (from b))
+        | +-suc (from b) (from b)
+  = refl
+
++-≡-*-2 : ∀ (n : ℕ) → n + n ≡ n * 2
++-≡-*-2 zero = refl
++-≡-*-2 (suc n)
+  rewrite +-suc n n
+        | +-≡-*-2 n
+  = refl
+
+from-to-identity : ∀ (n : ℕ) → from (to n) ≡ n
+from-to-identity zero = refl
+from-to-identity (suc n)
+  rewrite from-inc-≡-suc-from (to n)
+        | from-to-identity n
+  = refl
