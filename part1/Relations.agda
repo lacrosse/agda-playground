@@ -116,3 +116,20 @@ data Trichotomy (m n : ℕ) : Set where
   tri_fwd : m < n → Trichotomy m n
   tri_eq : m ≡ n → Trichotomy m n
   tri_bck : m > n → Trichotomy m n
+
++-monoʳ-< : ∀ (m n p : ℕ) → n < p → m + n < m + p
++-monoʳ-< zero n p h = h
++-monoʳ-< (suc m) n p h = s<s (+-monoʳ-< m n p h)
+
++-monoˡ-< : ∀ (m n p : ℕ) → n < p → n + m < p + m
++-monoˡ-< zero n p h
+  rewrite +-identityʳ n
+        | +-identityʳ p
+  = h
++-monoˡ-< (suc m) n p h
+  rewrite +-comm n (suc m)
+        | +-comm p (suc m)
+  = s<s (+-monoʳ-< m n p h)
+
++-mono-< : ∀ (m n p q : ℕ) → m < n → p < q → m + p < n + q
++-mono-< m n p q h1 h2 = <-trans (+-monoʳ-< m p q h2) (+-monoˡ-< q m n h1)
