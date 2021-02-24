@@ -4,7 +4,7 @@ import Relation.Binary.PropositionalEquality as Eq
 
 open Eq using (_≡_; refl; cong; sym)
 open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; step-≡; _∎)
-open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _∸_)
+open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _∸_; _^_)
 
 _ : (3 + 4) + 5 ≡ 3 + (4 + 5)
 _ =
@@ -169,4 +169,11 @@ _ =
         | ∸-suc (m ∸ n) p
         | ∸-suc m (n + p)
         | ∸-|-assoc m n p
+  = refl
+
+^-distribˡ-|-* : ∀ (m n p : ℕ) → m ^ (n + p) ≡ (m ^ n) * (m ^ p)
+^-distribˡ-|-* m zero p rewrite +-identityʳ (m ^ p) = refl
+^-distribˡ-|-* m (suc n) p
+  rewrite ^-distribˡ-|-* m n p
+        | *-assoc m (m ^ n) (m ^ p)
   = refl
