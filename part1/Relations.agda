@@ -68,3 +68,16 @@ data Total (m n : ℕ) : Set where
   where with-s≤s : Total m n → Total (suc m) (suc n)
         with-s≤s (forward h) = forward (s≤s h)
         with-s≤s (flipped h) = flipped (s≤s h)
+
++-monoʳ-≤ : ∀ (n p q : ℕ) → p ≤ q → n + p ≤ n + q
++-monoʳ-≤ zero p q h = h
++-monoʳ-≤ (suc n) p q h = s≤s (+-monoʳ-≤ n p q h)
+
++-monoˡ-≤ : ∀ (m n p : ℕ) → m ≤ n → m + p ≤ n + p
++-monoˡ-≤ n m p h
+  rewrite +-comm m p
+        | +-comm n p
+  = +-monoʳ-≤ p n m h
+
++-mono-≤ : ∀ (m n p q : ℕ) → m ≤ n → p ≤ q → m + p ≤ n + q
++-mono-≤ m n p q h1 h2 = ≤-trans (+-monoˡ-≤ m n p h1) (+-monoʳ-≤ n p q h2)
