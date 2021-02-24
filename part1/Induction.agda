@@ -123,3 +123,10 @@ _ =
         | *-distrib-+ m n p
         | +-swap p (m * p) (n * p)
   = refl
+
+*-assoc : ∀ (m n p : ℕ) → (m * n) * p ≡ m * (n * p)
+*-assoc zero n p = refl
+*-assoc (suc m) n p
+  rewrite *-distrib-+ n (m * n) p
+        | *-assoc m n p
+  = refl
