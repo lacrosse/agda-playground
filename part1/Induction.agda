@@ -130,3 +130,24 @@ _ =
   rewrite *-distrib-+ n (m * n) p
         | *-assoc m n p
   = refl
+
+*-identityʳ : ∀ (n : ℕ) → n * 1 ≡ n
+*-identityʳ zero = refl
+*-identityʳ (suc n) rewrite *-identityʳ n = refl
+
+*-sucʳ : ∀ (m n : ℕ) → m * suc n ≡ m + m * n
+*-sucʳ zero n = refl
+*-sucʳ (suc m) n
+  rewrite +-suc m (suc m * n)
+        | *-sucʳ m n
+        | sym (+-assoc n m (m * n))
+        | sym (+-assoc m n (m * n))
+        | +-comm m n
+  = refl
+
+*-comm : ∀ (m n : ℕ) → m * n ≡ n * m
+*-comm m zero rewrite *-zeroʳ m = refl
+*-comm m (suc n)
+  rewrite *-sucʳ m n
+        | *-comm m n
+  = refl
