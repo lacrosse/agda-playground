@@ -51,3 +51,20 @@ inv-z≤n z≤n = refl
   → m ≡ n
 ≤-antisym z≤n z≤n = refl
 ≤-antisym (s≤s h1) (s≤s h2) = cong suc (≤-antisym h1 h2)
+
+data Total (m n : ℕ) : Set where
+  forward :
+      m ≤ n
+    → Total m n
+
+  flipped :
+      n ≤ m
+    → Total m n
+
+≤-total : ∀ (m n : ℕ) → Total m n
+≤-total zero _ = forward z≤n
+≤-total (suc m) zero = flipped z≤n
+≤-total (suc m) (suc n) = with-s≤s (≤-total m n)
+  where with-s≤s : Total m n → Total (suc m) (suc n)
+        with-s≤s (forward h) = forward (s≤s h)
+        with-s≤s (flipped h) = flipped (s≤s h)
