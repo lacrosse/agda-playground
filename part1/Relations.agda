@@ -2,8 +2,8 @@ module part1.Relations where
 
 import Relation.Binary.PropositionalEquality as Eq
 open Eq using (_≡_; refl; cong)
-open import Data.Nat using (ℕ; zero; suc; _+_)
-open import Data.Nat.Properties using (+-comm; +-identityʳ)
+open import Data.Nat using (ℕ; zero; suc; _+_; _*_)
+open import Data.Nat.Properties using (+-comm; +-identityʳ; *-comm; *-zeroʳ)
 
 data _≤_ : ℕ → ℕ → Set where
   z≤n : ∀ {n : ℕ}
@@ -81,3 +81,20 @@ data Total (m n : ℕ) : Set where
 
 +-mono-≤ : ∀ (m n p q : ℕ) → m ≤ n → p ≤ q → m + p ≤ n + q
 +-mono-≤ m n p q h1 h2 = ≤-trans (+-monoˡ-≤ m n p h1) (+-monoʳ-≤ n p q h2)
+
+*-monoʳ-≤ : ∀ (m n p : ℕ) → n ≤ p → m * n ≤ m * p
+*-monoʳ-≤ zero n p h = z≤n
+*-monoʳ-≤ (suc m) n p h = +-mono-≤ n p (m * n) (m * p) h (*-monoʳ-≤ m n p h)
+
+*-monoˡ-≤ : ∀ (m n p : ℕ) → n ≤ p → n * m ≤ p * m
+*-monoˡ-≤ zero n p h
+  rewrite *-zeroʳ n
+        | *-zeroʳ p
+  = z≤n
+*-monoˡ-≤ (suc m) n p h
+  rewrite *-comm n (suc m)
+        | *-comm p (suc m)
+  = +-mono-≤ n p (m * n) (m * p) h (*-monoʳ-≤ m n p h)
+
+*-mono-≤ : ∀ (m n p q : ℕ) → m ≤ n → p ≤ q → m * p ≤ n * q
+*-mono-≤ m n p q h1 h2 = ≤-trans (*-monoʳ-≤ m p q h2) (*-monoˡ-≤ q m n h1)
