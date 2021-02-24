@@ -108,13 +108,13 @@ _ =
         | +-comm p m
   = refl
 
-*-identityʳ : ∀ (n : ℕ) → n * zero ≡ zero
-*-identityʳ zero = refl
-*-identityʳ (suc n) rewrite *-identityʳ n = refl
+*-zeroʳ : ∀ (n : ℕ) → n * zero ≡ zero
+*-zeroʳ zero = refl
+*-zeroʳ (suc n) rewrite *-zeroʳ n = refl
 
 *-distrib-+ : ∀ (m n p : ℕ) → (m + n) * p ≡ m * p + n * p
 *-distrib-+ m zero p
-  rewrite *-identityʳ p
+  rewrite *-zeroʳ p
         | +-identityʳ m
         | +-identityʳ (m * p)
   = refl
