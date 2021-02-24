@@ -188,3 +188,18 @@ _ =
         | sym (*-assoc (m ^ p) n (n ^ p))
         | *-comm n (m ^ p)
   = refl
+
+^-oneʳ : ∀ (n : ℕ) → 1 ^ n ≡ 1
+^-oneʳ zero = refl
+^-oneʳ (suc n)
+  rewrite +-identityʳ (1 ^ n)
+        | ^-oneʳ n
+  = refl
+
+^-*-assoc : ∀ (m n p : ℕ) → (m ^ n) ^ p ≡ m ^ (n * p)
+^-*-assoc m zero p rewrite ^-oneʳ p = refl
+^-*-assoc m (suc n) p
+  rewrite ^-distribʳ-* m (m ^ n) p
+        | ^-distribˡ-|-* m p (n * p)
+        | ^-*-assoc m n p
+  = refl
