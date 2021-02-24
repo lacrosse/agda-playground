@@ -82,9 +82,7 @@ _ =
   ∎
 
 +-comm′ : ∀ (m n : ℕ) → m + n ≡ n + m
-+-comm′ m zero
-  rewrite +-identity′ m
-  = refl
++-comm′ m zero rewrite +-identity′ m = refl
 +-comm′ m (suc n)
   rewrite +-suc′ m n
         | +-comm′ m n
@@ -150,4 +148,25 @@ _ =
 *-comm m (suc n)
   rewrite *-sucʳ m n
         | *-comm m n
+  = refl
+
+∸-zeroʳ : ∀ (n : ℕ) → zero ∸ n ≡ zero
+∸-zeroʳ zero = refl
+∸-zeroʳ (suc n) = refl
+
+∸-suc : ∀ (m n : ℕ) → m ∸ suc n ≡ m ∸ n ∸ 1
+∸-suc zero n
+  rewrite ∸-zeroʳ n
+        | ∸-zeroʳ 1
+  = refl
+∸-suc (suc m) zero = refl
+∸-suc (suc m) (suc n) rewrite ∸-suc m n = refl
+
+∸-|-assoc : ∀ (m n p : ℕ) → m ∸ n ∸ p ≡ m ∸ (n + p)
+∸-|-assoc m n zero rewrite +-identityʳ n = refl
+∸-|-assoc m n (suc p)
+  rewrite +-suc n p
+        | ∸-suc (m ∸ n) p
+        | ∸-suc m (n + p)
+        | ∸-|-assoc m n p
   = refl
