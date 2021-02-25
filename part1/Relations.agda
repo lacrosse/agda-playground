@@ -113,9 +113,9 @@ _>_ : ℕ → ℕ → Set
 m > n = n < m
 
 data Trichotomy (m n : ℕ) : Set where
-  tri_fwd : m < n → Trichotomy m n
-  tri_eq : m ≡ n → Trichotomy m n
-  tri_bck : m > n → Trichotomy m n
+  forward  : m < n → Trichotomy m n
+  equal    : m ≡ n → Trichotomy m n
+  backward : m > n → Trichotomy m n
 
 +-monoʳ-< : ∀ (m n p : ℕ) → n < p → m + n < m + p
 +-monoʳ-< zero n p h = h
@@ -148,3 +148,20 @@ data Trichotomy (m n : ℕ) : Set where
 
 <-trans-revisited : ∀ {m n p : ℕ} → m < n → n < p → m < p
 <-trans-revisited h1 h2 = ≤-iff-< _ _ (≤-trans (s≤s (<-≤ _ _ h1)) (<-iff-≤ _ _ h2))
+
+data even : ℕ → Set
+data odd  : ℕ → Set
+data even where
+  zero : even zero
+  suc  : ∀ {n : ℕ} → odd  n → even (suc n)
+data odd where
+  suc  : ∀ {n : ℕ} → even n → odd  (suc n)
+
+e+e≡e : ∀ {m n : ℕ} → even m → even n → even (m + n)
+
+o+e≡o : ∀ {m n : ℕ} → odd  m → even n → odd  (m + n)
+
+e+e≡e zero    en = en
+e+e≡e (suc o) en = suc (o+e≡o o en)
+
+o+e≡o (suc e) en = suc (e+e≡e e en)
