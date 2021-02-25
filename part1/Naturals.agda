@@ -114,32 +114,4 @@ infixl 7 _*_
 {-# BUILTIN NATMINUS _∸_ #-}
 
 -- Bin
-
-data Bin : Set where
-  ⟨⟩ : Bin
-  _O : Bin → Bin
-  _I : Bin → Bin
-
-inc : Bin → Bin
-inc ⟨⟩ = ⟨⟩ I
-inc (bin O) = bin I
-inc (bin I) = (inc bin) O
-
-_ = inc (⟨⟩ I O I I) ≡⟨⟩ ⟨⟩ I I O O ∎
-_ = inc (⟨⟩ I O I O) ≡⟨⟩ ⟨⟩ I O I I ∎
-_ = inc (⟨⟩ I I I I) ≡⟨⟩ ⟨⟩ I O O O O ∎
-
-to : ℕ → Bin
-to zero = ⟨⟩ O
-to (suc n) = inc (to n)
-
-_ = to 1 ≡⟨⟩ ⟨⟩ I ∎
-_ = to 93 ≡⟨⟩ ⟨⟩ I O I I I O I ∎
-
-from : Bin → ℕ
-from ⟨⟩ = 0
-from (bin O) = 2 * from bin
-from (bin I) = suc (2 * from bin)
-
-_ = from (⟨⟩ O O O O) ≡⟨⟩ 0 ∎
-_ = from (⟨⟩ I O I I I O I) ≡⟨⟩ 93 ∎
+-- exported
