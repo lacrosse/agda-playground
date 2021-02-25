@@ -132,12 +132,19 @@ data Trichotomy (m n : ℕ) : Set where
   = s<s (+-monoʳ-< m n p h)
 
 +-mono-< : ∀ (m n p q : ℕ) → m < n → p < q → m + p < n + q
-+-mono-< m n p q h1 h2 = <-trans (+-monoʳ-< m p q h2) (+-monoˡ-< q m n h1)
++-mono-< m n p q h1 h2 = <-trans (+-monoʳ-< _ _ _ h2) (+-monoˡ-< _ _ _ h1)
 
 ≤-iff-< : ∀ (m n : ℕ) → suc m ≤ n → m < n
 ≤-iff-< zero (suc n) (s≤s h) = 0<s
-≤-iff-< (suc m) (suc n) (s≤s h) = s<s (≤-iff-< m n h)
+≤-iff-< (suc _) (suc _) (s≤s h) = s<s (≤-iff-< _ _ h)
 
 <-iff-≤ : ∀ (m n : ℕ) → m < n → suc m ≤ n
 <-iff-≤ zero (suc n) 0<s = s≤s z≤n
-<-iff-≤ (suc m) (suc n) (s<s h) = s≤s (<-iff-≤ m n h)
+<-iff-≤ (suc m) (suc n) (s<s h) = s≤s (<-iff-≤ _ _ h)
+
+<-≤ : ∀ (m n : ℕ) → m < n → m ≤ n
+<-≤ zero (suc n) 0<s = z≤n
+<-≤ (suc m) (suc n) (s<s h) = s≤s (<-≤ _ _ h)
+
+<-trans-revisited : ∀ {m n p : ℕ} → m < n → n < p → m < p
+<-trans-revisited h1 h2 = ≤-iff-< _ _ (≤-trans (s≤s (<-≤ _ _ h1)) (<-iff-≤ _ _ h2))
