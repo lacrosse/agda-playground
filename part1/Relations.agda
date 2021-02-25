@@ -200,3 +200,11 @@ bin-inc-canonicity (⟨⟩ O) zero = leading-one one
 bin-inc-canonicity (⟨⟩ I) (leading-one one) = leading-one (one-O one)
 bin-inc-canonicity (bin O) (leading-one (one-O h)) = leading-one (one-I h)
 bin-inc-canonicity (bin I) (leading-one (one-I h)) = leading-one (one-O (bin-inc-oneness _ h))
+
+inc-to-one : ∀ (n : ℕ) → One (inc (to n))
+inc-to-one zero = one
+inc-to-one (suc n) = bin-inc-oneness _ (inc-to-one n)
+
+to-canonicity : ∀ (n : ℕ) → Can (to n)
+to-canonicity zero = zero
+to-canonicity (suc n) = leading-one (inc-to-one n)
