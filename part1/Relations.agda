@@ -133,3 +133,11 @@ data Trichotomy (m n : ℕ) : Set where
 
 +-mono-< : ∀ (m n p q : ℕ) → m < n → p < q → m + p < n + q
 +-mono-< m n p q h1 h2 = <-trans (+-monoʳ-< m p q h2) (+-monoˡ-< q m n h1)
+
+≤-iff-< : ∀ (m n : ℕ) → suc m ≤ n → m < n
+≤-iff-< zero (suc n) (s≤s h) = 0<s
+≤-iff-< (suc m) (suc n) (s≤s h) = s<s (≤-iff-< m n h)
+
+<-iff-≤ : ∀ (m n : ℕ) → m < n → suc m ≤ n
+<-iff-≤ zero (suc n) 0<s = s≤s z≤n
+<-iff-≤ (suc m) (suc n) (s<s h) = s≤s (<-iff-≤ m n h)
