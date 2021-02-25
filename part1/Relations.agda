@@ -175,3 +175,28 @@ even-even-suc-suc n m h
 
 o+o≡e : ∀ {m n : ℕ} → odd m → odd n → even (m + n)
 o+o≡e (suc em) (suc en) = even-even-suc-suc _ _ (e+e≡e em en)
+
+-- Bin-predicates
+
+data One : Bin → Set
+data One where
+  one   : One (⟨⟩ I)
+  one-O : ∀ {b : Bin} → One b → One (b O)
+  one-I : ∀ {b : Bin} → One b → One (b I)
+
+data Can : Bin → Set
+data Can where
+  zero        : Can (⟨⟩ O)
+  leading-one : ∀ {b : Bin} → One b → Can b
+
+bin-inc-oneness : ∀ (b : Bin) → One b → One (inc b)
+bin-inc-oneness (⟨⟩ I) one = one-O one
+bin-inc-oneness (b O) (one-O h) = one-I h
+bin-inc-oneness (b I) (one-I h) = one-O (bin-inc-oneness _ h)
+
+bin-inc-canonicity : ∀ (bin : Bin) → Can bin → Can (inc bin)
+bin-inc-canonicity ⟨⟩ (leading-one x) = leading-one (one-I x)
+bin-inc-canonicity (⟨⟩ O) zero = leading-one one
+bin-inc-canonicity (⟨⟩ I) (leading-one one) = leading-one (one-O one)
+bin-inc-canonicity (bin O) (leading-one (one-O h)) = leading-one (one-I h)
+bin-inc-canonicity (bin I) (leading-one (one-I h)) = leading-one (one-O (bin-inc-oneness _ h))
