@@ -165,3 +165,12 @@ e+e≡e zero    en = en
 e+e≡e (suc o) en = suc (o+e≡o o en)
 
 o+e≡o (suc e) en = suc (e+e≡e e en)
+
+even-even-suc-suc : ∀ (n m : ℕ) → even (n + m) → even (suc n + suc m)
+even-even-suc-suc n m h
+  rewrite +-comm n (suc m)
+        | +-comm m n
+  = suc (suc h)
+
+o+o≡e : ∀ {m n : ℕ} → odd m → odd n → even (m + n)
+o+o≡e (suc em) (suc en) = even-even-suc-suc _ _ (e+e≡e em en)
