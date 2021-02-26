@@ -201,3 +201,61 @@ can-inc-can (leading-one h) = leading-one (one-inc-one h)
 to-can : ∀ (n : ℕ) → Can (to n)
 to-can zero = zero
 to-can (suc n) = can-inc-can (to-can n)
+
+_+ᵇ_ : Bin → Bin → Bin
+infixl 6 _+ᵇ_
+⟨⟩    +ᵇ c     = c
+(b O) +ᵇ ⟨⟩    = (b O)
+(b O) +ᵇ (c O) = (b +ᵇ c) O
+(b O) +ᵇ (c I) = (b +ᵇ c) I
+(b I) +ᵇ ⟨⟩    = (b I)
+(b I) +ᵇ (c O) = (b +ᵇ c) I
+(b I) +ᵇ (c I) = (inc (b +ᵇ c)) O
+
++ᵇ-identityˡ : ∀ (b : Bin) → Can b → ⟨⟩ O +ᵇ b ≡ b
++ᵇ-identityˡ (⟨⟩ O) zero = refl
++ᵇ-identityˡ (b O) (leading-one _) = refl
++ᵇ-identityˡ (b I) (leading-one _) = refl
+
++ᵇ-incʳ : ∀ (b c : Bin) → inc b +ᵇ c ≡ inc (b +ᵇ c)
++ᵇ-incʳ ⟨⟩ ⟨⟩ = refl
++ᵇ-incʳ ⟨⟩ (c O) = refl
++ᵇ-incʳ ⟨⟩ (c I) = refl
++ᵇ-incʳ (b O) ⟨⟩ = refl
++ᵇ-incʳ (b O) (c O) = refl
++ᵇ-incʳ (b O) (c I) = refl
++ᵇ-incʳ (b I) ⟨⟩ = refl
++ᵇ-incʳ (b I) (c O) rewrite +ᵇ-incʳ b c = refl
++ᵇ-incʳ (b I) (c I) rewrite +ᵇ-incʳ b c = refl
+
+to-distrib-+-+ᵇ : ∀ (m n : ℕ) → to (m + n) ≡ to m +ᵇ to n
+to-distrib-+-+ᵇ zero zero = refl
+to-distrib-+-+ᵇ zero (suc n) rewrite +ᵇ-identityˡ (inc (to n)) (can-inc-can (to-can n)) = refl
+to-distrib-+-+ᵇ (suc m) n
+  rewrite to-distrib-+-+ᵇ m n
+        | +ᵇ-incʳ (to m) (to n)
+  = refl
+
++ᵇ-O : ∀ {b : Bin} → One b → b +ᵇ b ≡ b O
++ᵇ-O one = refl
++ᵇ-O (one-O h) rewrite +ᵇ-O h = refl
++ᵇ-O (one-I h) rewrite +ᵇ-O h = refl
+
+one-to-from-identity : ∀ {b : Bin} → One b → to (from b) ≡ b
+one-to-from-identity one = refl
+one-to-from-identity {b O} (one-O h)
+  rewrite +-identityʳ (from b)
+        | to-distrib-+-+ᵇ (from b) (from b)
+        | one-to-from-identity h
+        | +ᵇ-O h
+  = refl
+one-to-from-identity {b I} (one-I h)
+  rewrite +-identityʳ (from b)
+        | to-distrib-+-+ᵇ (from b) (from b)
+        | one-to-from-identity h
+        | +ᵇ-O h
+  = refl
+
+can-to-from-identity : ∀ {b : Bin} → Can b → to (from b) ≡ b
+can-to-from-identity zero = refl
+can-to-from-identity {b} (leading-one x) = one-to-from-identity x
