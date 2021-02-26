@@ -122,3 +122,11 @@ data odd where
 
 even-comm : ∀ (m n : ℕ) → even (m + n) → even (n + m)
 even-comm m n h rewrite +-comm n m = h
+
+even-comm′ : ∀ (m n : ℕ) → even (m + n) → even (n + m)
+even-comm′ m n h
+  with   m + n  | +-comm m n
+...  | .(n + m) | refl       = h
+
+even-comm″ : ∀ (m n : ℕ) → even (m + n) → even (n + m)
+even-comm″ m n = subst even (+-comm m n)
