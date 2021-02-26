@@ -82,7 +82,7 @@ module ≤-Reasoning where
   ≤-trans (s≤s h1) (s≤s h2) = s≤s (≤-trans h1 h2)
 
   infix 1 min_
-  infix 2 _≤⟨⟩_ _≤⟨_⟩_
+  infixr 2 _≤⟨⟩_ _≤⟨_⟩_
   infix 3 _max
 
   min_ : ∀ {m n : ℕ} → m ≤ n → m ≤ n
@@ -101,6 +101,8 @@ open ≤-Reasoning
 _ : suc (suc zero) ≤ suc (suc (suc zero))
 _ =
   min
+    suc (suc zero)
+  ≤⟨⟩
     suc (suc zero)
   ≤⟨ s≤s (s≤s 0≤n) ⟩
     suc (suc (suc zero))
