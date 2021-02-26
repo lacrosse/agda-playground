@@ -134,4 +134,19 @@ even-comm″ m n = subst even (+-comm m n)
 -- Leibniz/Martin-Löf equality
 
 _≐_ : ∀ {A : Set} (x y : A) → Set₁
-_≐_ {A} x y = ∀ (f : A → Set) → f x → f y
+_≐_ {A} x y = ∀ (P : A → Set) → P x → P y
+
+refl-≐ : ∀ {A : Set} {x : A} → x ≐ x
+refl-≐ _ Px = Px
+
+trans-≐ : ∀ {A : Set} {x y z : A} → x ≐ y → y ≐ z → x ≐ z
+trans-≐ h1 h2 P Px = h2 P (h1 P Px)
+
+sym-≐ : ∀ {A : Set} {x y : A} → x ≐ y → y ≐ x
+sym-≐ {_} {x} h P = h (λ _ → P _ → P x) (refl-≐ P)
+
+≡-implies-≐ : ∀ {A : Set} {x y : A} → x ≡ y → x ≐ y
+≡-implies-≐ refl P = subst P refl
+
+≐-implies-≡ : ∀ {A : Set} {x y : A} → x ≐ y → x ≡ y
+≐-implies-≡ {_} {x} x≐y = x≐y (_≡_ x) refl
