@@ -105,3 +105,18 @@ _ =
   ≤⟨ s≤s (s≤s 0≤n) ⟩
     suc (suc (suc zero))
   max
+
+-- Rewriting
+
+data even : ℕ → Set
+data odd  : ℕ → Set
+data even where
+  e-z : even zero
+  e-s : ∀ {n : ℕ} → odd n → even (suc n)
+data odd where
+  o-s : ∀ {n : ℕ} → even n → odd (suc n)
+
+{-# BUILTIN EQUALITY _≡_ #-}
+
+even-comm : ∀ (m n : ℕ) → even (m + n) → even (n + m)
+even-comm m n h rewrite +-comm n m = h
