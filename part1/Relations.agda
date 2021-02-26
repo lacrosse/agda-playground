@@ -189,22 +189,15 @@ data Can where
   zero        : Can (⟨⟩ O)
   leading-one : ∀ {b : Bin} → One b → Can b
 
-bin-inc-oneness : ∀ (b : Bin) → One b → One (inc b)
-bin-inc-oneness (⟨⟩ I) one = one-O one
-bin-inc-oneness (b O) (one-O h) = one-I h
-bin-inc-oneness (b I) (one-I h) = one-O (bin-inc-oneness _ h)
+one-inc-one : ∀ {b : Bin} → One b → One (inc b)
+one-inc-one one = one-O one
+one-inc-one (one-O h) = one-I h
+one-inc-one (one-I h) = one-O (one-inc-one h)
 
-bin-inc-canonicity : ∀ (bin : Bin) → Can bin → Can (inc bin)
-bin-inc-canonicity ⟨⟩ (leading-one x) = leading-one (one-I x)
-bin-inc-canonicity (⟨⟩ O) zero = leading-one one
-bin-inc-canonicity (⟨⟩ I) (leading-one one) = leading-one (one-O one)
-bin-inc-canonicity (bin O) (leading-one (one-O h)) = leading-one (one-I h)
-bin-inc-canonicity (bin I) (leading-one (one-I h)) = leading-one (one-O (bin-inc-oneness _ h))
+can-inc-can : ∀ {b : Bin} → Can b → Can (inc b)
+can-inc-can zero = leading-one one
+can-inc-can (leading-one h) = leading-one (one-inc-one h)
 
-inc-to-one : ∀ (n : ℕ) → One (inc (to n))
-inc-to-one zero = one
-inc-to-one (suc n) = bin-inc-oneness _ (inc-to-one n)
-
-to-canonicity : ∀ (n : ℕ) → Can (to n)
-to-canonicity zero = zero
-to-canonicity (suc n) = leading-one (inc-to-one n)
+to-can : ∀ (n : ℕ) → Can (to n)
+to-can zero = zero
+to-can (suc n) = can-inc-can (to-can n)
