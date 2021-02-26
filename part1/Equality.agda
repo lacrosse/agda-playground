@@ -21,7 +21,87 @@ cong₂ : ∀ {X Y Z : Set} {x₁ x₂ : X} {y₁ y₂ : Y} (f : X → Y → Z)
 cong₂ f refl refl = refl
 
 cong-app : ∀ {A B : Set} {f g : A → B} → f ≡ g → ∀ (x : A) → f x ≡ g x
-cong-app refl h = refl
+cong-app refl x = refl
 
 subst : ∀ {A : Set} {x y : A} (f : A → Set) → x ≡ y → f x → f y
 subst _ refl h = h
+
+module ≡-Reasoning {A : Set} where
+  infix 1 begin_
+  infixr 2 _≡⟨⟩_ _≡⟨_⟩_
+  infix 3 _∎
+
+  begin_ : ∀ {x y : A} → x ≡ y → x ≡ y
+  begin h = h
+
+  _≡⟨⟩_ : ∀ (x : A) {y : A} → x ≡ y → x ≡ y
+  x ≡⟨⟩ refl = refl
+
+  _≡⟨_⟩_ : ∀ (x : A) {y z : A} → x ≡ y → y ≡ z → x ≡ z
+  x ≡⟨ h1 ⟩ h2 = trans h1 h2
+
+  _∎ : ∀ (x : A) → x ≡ x
+  _ ∎ = refl
+open ≡-Reasoning
+
+data ℕ : Set where
+  zero : ℕ
+  suc  : ℕ → ℕ
+
+_+_ : ℕ → ℕ → ℕ
+zero    + n  =  n
+(suc m) + n  =  suc (m + n)
+
+postulate
+  +-identity : ∀ (m : ℕ) → m + zero ≡ m
+  +-suc : ∀ (m n : ℕ) → m + suc n ≡ suc (m + n)
+
++-comm : ∀ (m n : ℕ) → m + n ≡ n + m
++-comm m zero = begin
+  m + zero  ≡⟨ +-identity m ⟩
+  m         ≡⟨⟩
+  zero + m  ∎
++-comm m (suc n) = begin
+  m + suc n    ≡⟨ +-suc m n ⟩
+  suc (m + n)  ≡⟨ cong suc (+-comm m n) ⟩
+  suc (n + m)  ≡⟨⟩
+  suc n + m    ∎
+
+module ≤-Reasoning where
+  data _≤_ : ℕ → ℕ → Set where
+    0≤n : ∀ {n : ℕ} → zero ≤ n
+    s≤s : ∀ {m n : ℕ} → m ≤ n → suc m ≤ suc n
+  infix 4 _≤_
+
+  ≤-refl : ∀ (m : ℕ) → m ≤ m
+  ≤-refl zero = 0≤n
+  ≤-refl (suc m) = s≤s (≤-refl m)
+
+  ≤-trans : ∀ {m n p : ℕ} → m ≤ n → n ≤ p → m ≤ p
+  ≤-trans 0≤n _ = 0≤n
+  ≤-trans (s≤s h1) (s≤s h2) = s≤s (≤-trans h1 h2)
+
+  infix 1 min_
+  infix 2 _≤⟨⟩_ _≤⟨_⟩_
+  infix 3 _max
+
+  min_ : ∀ {m n : ℕ} → m ≤ n → m ≤ n
+  min h = h
+
+  _≤⟨⟩_ : ∀ (m : ℕ) {n : ℕ} → m ≤ n → m ≤ n
+  m ≤⟨⟩ h = h
+
+  _≤⟨_⟩_ : ∀ (m : ℕ) {n p : ℕ} → m ≤ n → n ≤ p → m ≤ p
+  m ≤⟨ h1 ⟩ h2 = ≤-trans h1 h2
+
+  _max : ∀ (m : ℕ) → m ≤ m
+  m max = ≤-refl m
+open ≤-Reasoning
+
+_ : suc (suc zero) ≤ suc (suc (suc zero))
+_ =
+  min
+    suc (suc zero)
+  ≤⟨ s≤s (s≤s 0≤n) ⟩
+    suc (suc (suc zero))
+  max
