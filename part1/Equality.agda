@@ -130,3 +130,8 @@ even-comm′ m n h
 
 even-comm″ : ∀ (m n : ℕ) → even (m + n) → even (n + m)
 even-comm″ m n = subst even (+-comm m n)
+
+-- Leibniz/Martin-Löf equality
+
+_≐_ : ∀ {A : Set} (x y : A) → Set₁
+_≐_ {A} x y = ∀ (f : A → Set) → f x → f y
