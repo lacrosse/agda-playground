@@ -150,3 +150,19 @@ sym-≐ {_} {x} h P = h (λ _ → P _ → P x) (refl-≐ P)
 
 ≐-implies-≡ : ∀ {A : Set} {x y : A} → x ≐ y → x ≡ y
 ≐-implies-≡ {_} {x} x≐y = x≐y (_≡_ x) refl
+
+-- Universe polymorphism
+
+open import Level using (Level; _⊔_) renaming (zero to lzero; suc to lsuc)
+
+data _≡′_ {ℓ : Level} {A : Set ℓ} (x : A) : A → Set ℓ where
+  refl′ : x ≡′ x
+
+sym′ : ∀ {ℓ : Level} {A : Set ℓ} {x y : A} → x ≡′ y → y ≡′ x
+sym′ refl′ = refl′
+
+_≐′_ : ∀ {ℓ : Level} {A : Set ℓ} (x y : A) → Set (lsuc ℓ)
+_≐′_ {ℓ} {A} x y = ∀ (P : A → Set ℓ) → P x → P y
+
+_∘_ : ∀ {ℓ₁ ℓ₂ ℓ₃ : Level} {A : Set ℓ₁} {B : Set ℓ₂} {C : Set ℓ₃} → (B → C) → (A → B) → A → C
+(g ∘ f) x = g (f x)
