@@ -175,3 +175,11 @@ module ≤-Reasoning where
   _≤-∎ : ∀ (A : Set) → A ≤ A
   A ≤-∎ = ≤-refl
 open ≤-Reasoning
+
+≃-implies-≤ : ∀ {A B : Set} → A ≃ B → A ≤ B
+≃-implies-≤ A≃B =
+  record
+    { to = to A≃B
+    ; from = from A≃B
+    ; from∘to = from∘to A≃B
+    }
