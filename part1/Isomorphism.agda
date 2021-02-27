@@ -201,3 +201,16 @@ open _⇔_
 
 ⇔-trans : {A B C : Set} → A ⇔ B → B ⇔ C → A ⇔ C
 ⇔-trans A⇔B B⇔C = record { to = to B⇔C ∘ to A⇔B ; from = from A⇔B ∘ from B⇔C }
+
+-- Bin-embedding
+
+open import part1._Bin using (Bin; ⟨⟩; _I; _O) renaming (from to from-bin; to to to-bin)
+open import part1.Induction using (from-to-identity)
+
+ℕ-≤-Bin : ℕ ≤ Bin
+ℕ-≤-Bin =
+  record
+    { to = to-bin
+    ; from = from-bin
+    ; from∘to = from-to-identity
+    }
