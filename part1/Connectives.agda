@@ -225,8 +225,8 @@ uniq-⊥ _ ()
 ... | cc | bb = 8
 ... | cc | cc = 9
 
-currying : ∀ {A B C : Set} → (A → B → C) ≃ (A × B → C)
-currying =
+schönfinkelisation : ∀ {A B C : Set} → (A → B → C) ≃ (A × B → C)
+schönfinkelisation =
   record
     { to = λ{f ⟨ a , b ⟩ → f a b}
     ; from = λ{g a b → g ⟨ a , b ⟩}
@@ -234,4 +234,4 @@ currying =
     ; to∘from = λ{g → extensionality λ{⟨ a , b ⟩ → refl}}
     }
 
-schönfinkelisation = currying
+currying = schönfinkelisation
