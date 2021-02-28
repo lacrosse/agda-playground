@@ -6,4 +6,5 @@ I'm progressing through PLFA and writing these proofs.
 * [x] Induction
 * [x] Relations
 * [x] Equality
-* [ ] Isomorphism
+* [x] Isomorphism
+  * [x] + ℕ-CanBin isomorphism
