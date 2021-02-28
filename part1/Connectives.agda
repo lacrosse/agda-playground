@@ -170,3 +170,35 @@ infixr 1 _⊎_
     ; from∘to = λ{(inj₁ (inj₁ a)) → refl ; (inj₁ (inj₂ b)) → refl ; (inj₂ c) → refl}
     ; to∘from = λ{(inj₁ a) → refl ; (inj₂ (inj₁ b)) → refl ; (inj₂ (inj₂ c)) → refl}
     }
+
+-- False
+
+data ⊥ : Set where
+
+⊥-elim : ∀ {A : Set} → ⊥ → A
+⊥-elim ()
+
+uniq-⊥ : ∀ {C : Set} (h : ⊥ → C) (w : ⊥) → ⊥-elim w ≡ h w
+uniq-⊥ _ ()
+
+⊥-count : ⊥ → ℕ
+⊥-count ()
+
+⊥-identityˡ : ∀ {A : Set} → ⊥ ⊎ A ≃ A
+⊥-identityˡ =
+  record
+    { to = λ{(inj₂ a) → a}
+    ; from = λ a → inj₂ a
+    ; from∘to = λ{(inj₂ _) → refl}
+    ; to∘from = λ _ → refl
+    }
+
+⊥-identityʳ : ∀ {A : Set} → A ⊎ ⊥ ≃ A
+⊥-identityʳ {A} =
+  ≃-begin
+    (A ⊎ ⊥)
+  ≃⟨ ⊎-comm ⟩
+    (⊥ ⊎ A)
+  ≃⟨ ⊥-identityˡ ⟩
+    A
+  ≃-∎
