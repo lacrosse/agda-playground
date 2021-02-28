@@ -135,34 +135,27 @@ peirce-implies-all h =
 
 --   I'm tired of this. ¯\_(ツ)_/¯ Moving on.
 
+-- Classical laws: excluded middle
+
 postulate
-  em : ∀ {A : Set} → A ⊎ ¬ A
+  em : em-Type
 
 em-irrefutable : ∀ {A : Set} → ¬ ¬ (A ⊎ ¬ A)
 em-irrefutable k = (k ∘ inj₂) (k ∘ inj₁)
 
--- Classical
+-- Classical laws: proofs
 
-¬¬-elim : ∀ {A : Set} → ¬ ¬ A → A
-¬¬-elim {A} ¬¬a with em {A}
-... | inj₁ a  = a
-... | inj₂ ¬a = (⊥-elim ∘ ¬¬a) ¬a
+¬¬-elim : ¬¬-elim-Type
+¬¬-elim   = (proj₁ ∘ em-implies-all) em
 
-peirce : ∀ {A B : Set} → ((A → B) → A) → A
-peirce {A} f with em {A}
-... | inj₁ a  = a
-... | inj₂ ¬a = f (⊥-elim ∘ ¬a)
+peirce : peirce-Type
+peirce    = (proj₁ ∘ proj₂ ∘ em-implies-all) em
 
-→-⊎ : ∀ {A B : Set} → (A → B) → ¬ A ⊎ B
-→-⊎ {A} a→b with em {A}
-... | inj₁ a  = inj₂ (a→b a)
-... | inj₂ ¬a = inj₁ ¬a
+→-⊎ : →-⊎-Type
+→-⊎       = (proj₁ ∘ proj₂ ∘ proj₂ ∘ em-implies-all) em
 
-de-morgan : ∀ {A B : Set} → ¬ (¬ A × ¬ B) → A ⊎ B
-de-morgan {A} {B} ¬× with em {A} | em {B}
-... | inj₂ ¬a | inj₂ ¬b = ⊥-elim (¬× (¬a , ¬b))
-... | inj₂ ¬a | inj₁ b  = inj₂ b
-... | inj₁ a  | _       = inj₁ a
+de-morgan : de-morgan-Type
+de-morgan = (proj₂ ∘ proj₂ ∘ proj₂ ∘ em-implies-all) em
 
 -- Stable
 
