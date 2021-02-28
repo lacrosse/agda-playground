@@ -59,3 +59,22 @@ open _<_
 
 <-irreflexive : ∀ {n : ℕ} → ¬ (n < n)
 <-irreflexive (s<s h) = <-irreflexive h
+
+data <-Trichotomy (m n : ℕ) : Set where
+  fw : ¬ (m < n) × ¬ (m ≡ n) × m > n → <-Trichotomy m n
+  eq : ¬ (m < n) × m ≡ n × ¬ (m > n) → <-Trichotomy m n
+  bw : m < n × ¬ (m ≡ n) × ¬ (m > n) → <-Trichotomy m n
+
+≡-suc : ∀ {m n : ℕ} → suc m ≡ suc n → m ≡ n
+≡-suc refl = refl
+
+trichotomy : ∀ (m n : ℕ) → <-Trichotomy m n
+trichotomy zero zero = eq ((λ()) , refl , (λ()))
+trichotomy zero (suc n) = bw (0<s , (λ()) , (λ()))
+trichotomy (suc m) zero = fw ((λ()) , (λ()) , 0<s)
+trichotomy (suc m) (suc n) = h (trichotomy m n)
+  where
+    h : <-Trichotomy m n → <-Trichotomy (suc m) (suc n)
+    h (fw (a , b , c)) = fw ((λ{(s<s h) → a h}) , b ∘ ≡-suc , s<s c)
+    h (eq (a , b , c)) = eq ((λ{(s<s h) → a h}) , cong suc b , λ{(s<s h) → c h})
+    h (bw (a , b , c)) = bw (s<s a , b ∘ ≡-suc , λ{(s<s h) → c h})
