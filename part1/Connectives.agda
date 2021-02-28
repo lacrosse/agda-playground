@@ -7,18 +7,19 @@ open import Data.Nat using (ℕ)
 open import Function using (_∘_)
 open import part1.Isomorphism using (_≃_; _≲_; extensionality)
 open part1.Isomorphism.≃-Reasoning
+open import Level
 
 -- Conjunction
 
-data _×_ (A B : Set) : Set where
+data _×_ {ℓ : Level} (A B : Set ℓ) : Set ℓ where
   ⟨_,_⟩ : A → B → A × B
 
 infixr 2 ⟨_,_⟩
 
-proj₁ : ∀ {A B : Set} → A × B → A
+proj₁ : ∀ {ℓ : Level} {A B : Set ℓ} → A × B → A
 proj₁ ⟨ a , b ⟩ = a
 
-proj₂ : ∀ {A B : Set} → A × B → B
+proj₂ : ∀ {ℓ : Level} {A B : Set ℓ} → A × B → B
 proj₂ ⟨ a , b ⟩ = b
 
 η-× : ∀ {A B : Set} (w : A × B) → ⟨ proj₁ w , proj₂ w ⟩ ≡ w
@@ -130,7 +131,7 @@ truth′ = _
 
 -- Disjunction
 
-data _⊎_ (A B : Set) : Set where
+data _⊎_ {ℓ : Level} (A B : Set ℓ) : Set ℓ where
   inj₁ : A → A ⊎ B
   inj₂ : B → A ⊎ B
 
@@ -271,7 +272,12 @@ currying = schönfinkelisation
 ⊎-distrib-× =
   record
     { to = λ {(inj₁ ⟨ a , b ⟩) → ⟨ inj₁ a , inj₁ b ⟩ ; (inj₂ c) → ⟨ inj₂ c , inj₂ c ⟩}
-    ; from = λ {⟨ inj₁ a , inj₁ b ⟩ → inj₁ ⟨ a , b ⟩ ; ⟨ _ , inj₂ c ⟩ → inj₂ c ; ⟨ inj₂ c , _ ⟩ → inj₂ c}
+    ; from = λ
+      { ⟨ inj₁ a , inj₁ b ⟩ → inj₁ ⟨ a , b ⟩
+      ; ⟨ inj₂ c , inj₁ _ ⟩ → inj₂ c
+      ; ⟨ inj₁ a , inj₂ c ⟩ → inj₂ c
+      ; ⟨ inj₂ c , inj₂ _ ⟩ → inj₂ c
+      }
     ; from∘to = λ{(inj₁ ⟨ a , b ⟩) → refl ; (inj₂ c) → refl}
     }
 
