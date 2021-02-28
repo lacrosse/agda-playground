@@ -202,3 +202,36 @@ uniq-⊥ _ ()
   ≃⟨ ⊥-identityˡ ⟩
     A
   ≃-∎
+
+-- Implication
+
+-- Modus ponens
+
+→-elim : ∀ {A B : Set} → (A → B) → A → B
+→-elim a→b a = a→b a
+
+η-→ : ∀ {A B : Set} (f : A → B) → (λ (x : A) → f x) ≡ f
+η-→ f = refl
+
+→-count : (Bool → Tri) → ℕ
+→-count f with f true | f true
+... | aa | aa = 1
+... | aa | bb = 2
+... | aa | cc = 3
+... | bb | aa = 4
+... | bb | bb = 5
+... | bb | cc = 6
+... | cc | aa = 7
+... | cc | bb = 8
+... | cc | cc = 9
+
+currying : ∀ {A B C : Set} → (A → B → C) ≃ (A × B → C)
+currying =
+  record
+    { to = λ{f ⟨ a , b ⟩ → f a b}
+    ; from = λ{g a b → g ⟨ a , b ⟩}
+    ; from∘to = λ{f → refl}
+    ; to∘from = λ{g → extensionality λ{⟨ a , b ⟩ → refl}}
+    }
+
+schönfinkelisation = currying
