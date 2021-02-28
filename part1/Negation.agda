@@ -84,23 +84,34 @@ trichotomy (suc m) (suc n) = h (trichotomy m n)
 
 -- Excluded middle
 
+postulate
+  em : ∀ {A : Set} → A ⊎ ¬ A
+
 em-irrefutable : ∀ {A : Set} → ¬ ¬ (A ⊎ ¬ A)
 em-irrefutable k = (k ∘ inj₂) (k ∘ inj₁)
 
-excluded-middle : ∀ {A : Set} → A ⊎ ¬ A
-excluded-middle = {!   !}
+-- Classical
 
 ¬¬-elim : ∀ {A : Set} → ¬ ¬ A → A
-¬¬-elim h = {!   !}
+¬¬-elim {A} ¬¬a with em {A}
+... | inj₁ a  = a
+... | inj₂ ¬a = (⊥-elim ∘ ¬¬a) ¬a
 
 peirce : ∀ {A B : Set} → ((A → B) → A) → A
-peirce = {!   !}
+peirce {A} f with em {A}
+... | inj₁ a  = a
+... | inj₂ ¬a = f (⊥-elim ∘ ¬a)
 
 →-⊎ : ∀ {A B : Set} → (A → B) → ¬ A ⊎ B
-→-⊎ = {!   !}
+→-⊎ {A} a→b with em {A}
+... | inj₁ a  = inj₂ (a→b a)
+... | inj₂ ¬a = inj₁ ¬a
 
 de-morgan : ∀ {A B : Set} → ¬ (¬ A × ¬ B) → A ⊎ B
-de-morgan = {!   !}
+de-morgan {A} {B} ¬× with em {A} | em {B}
+... | inj₂ ¬a | inj₂ ¬b = ⊥-elim (¬× (¬a , ¬b))
+... | inj₂ ¬a | inj₁ b  = inj₂ b
+... | inj₁ a  | _       = inj₁ a
 
 -- Stable
 
