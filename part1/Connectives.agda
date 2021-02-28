@@ -13,6 +13,8 @@ open part1.Isomorphism.≃-Reasoning
 data _×_ (A B : Set) : Set where
   ⟨_,_⟩ : A → B → A × B
 
+infixr 2 ⟨_,_⟩
+
 proj₁ : ∀ {A B : Set} → A × B → A
 proj₁ ⟨ a , b ⟩ = a
 

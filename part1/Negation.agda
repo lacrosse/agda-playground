@@ -3,8 +3,6 @@ module part1.Negation where
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong)
 open import Data.Nat using (ℕ; zero; suc)
 open import Data.Empty using (⊥; ⊥-elim)
-open import Data.Sum using (_⊎_; inj₁; inj₂)
-open import Data.Product using (_×_; _,_)
 open import part1.Isomorphism using (_≃_; extensionality)
 
 -- Negation
@@ -60,6 +58,8 @@ open _<_
 <-irreflexive : ∀ {n : ℕ} → ¬ (n < n)
 <-irreflexive (s<s h) = <-irreflexive h
 
+open import part1.Connectives using (→-distrib-⊎; _×_; _⊎_; inj₁; inj₂) renaming (⟨_,_⟩ to _,_)
+
 data <-Trichotomy (m n : ℕ) : Set where
   fw : ¬ (m < n) × ¬ (m ≡ n) × m > n → <-Trichotomy m n
   eq : ¬ (m < n) × m ≡ n × ¬ (m > n) → <-Trichotomy m n
@@ -69,7 +69,7 @@ data <-Trichotomy (m n : ℕ) : Set where
 ≡-suc refl = refl
 
 trichotomy : ∀ (m n : ℕ) → <-Trichotomy m n
-trichotomy zero zero = eq ((λ()) , refl , (λ()))
+trichotomy zero zero = eq ( (λ()) , (refl) , (λ()))
 trichotomy zero (suc n) = bw (0<s , (λ()) , (λ()))
 trichotomy (suc m) zero = fw ((λ()) , (λ()) , 0<s)
 trichotomy (suc m) (suc n) = h (trichotomy m n)
@@ -78,3 +78,6 @@ trichotomy (suc m) (suc n) = h (trichotomy m n)
     h (fw (a , b , c)) = fw ((λ{(s<s h) → a h}) , b ∘ ≡-suc , s<s c)
     h (eq (a , b , c)) = eq ((λ{(s<s h) → a h}) , cong suc b , λ{(s<s h) → c h})
     h (bw (a , b , c)) = bw (s<s a , b ∘ ≡-suc , λ{(s<s h) → c h})
+
+⊎-dual-× : ∀ {A B : Set} → ¬ (A ⊎ B) ≃ (¬ A) × (¬ B)
+⊎-dual-× = →-distrib-⊎
