@@ -84,3 +84,44 @@ open _⇔_
     ; from∘to = λ a⇔b → refl
     ; to∘from = λ{⟨ a→b , b→a ⟩ → refl}
     }
+
+-- Truth
+
+data ⊤ : Set where
+  tt : ⊤
+
+η-⊤ : ∀ (w : ⊤) → tt ≡ w
+η-⊤ tt = refl
+
+-- Truth as empty record
+
+record ⊤′ : Set where
+  constructor tt′
+
+η-⊤′ : ∀ (w : ⊤′) → tt′ ≡ w
+η-⊤′ w = refl
+
+truth′ : ⊤′
+truth′ = _
+
+⊤-count : ⊤ → ℕ
+⊤-count tt = 1
+
+⊤-identityˡ : ∀ {A : Set} → ⊤ × A ≃ A
+⊤-identityˡ =
+  record
+    { to = λ{⟨ _ , a ⟩ → a}
+    ; from = λ a → ⟨ tt , a ⟩
+    ; from∘to = λ{⟨ tt , _ ⟩ → refl}
+    ; to∘from = λ a → refl
+    }
+
+⊤-identityʳ : ∀ {A : Set} → A × ⊤ ≃ A
+⊤-identityʳ {A} =
+  ≃-begin
+    (A × ⊤)
+  ≃⟨ ×-comm ⟩
+    (⊤ × A)
+  ≃⟨ ⊤-identityˡ ⟩
+    A
+  ≃-∎
