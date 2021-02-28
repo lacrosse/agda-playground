@@ -235,3 +235,50 @@ schönfinkelisation =
     }
 
 currying = schönfinkelisation
+
+-- Distributions
+
+→-distrib-⊎ : ∀ {A B C : Set} → (A ⊎ B → C) ≃ ((A → C) × (B → C))
+→-distrib-⊎ =
+  record
+    { to = λ f → ⟨ f ∘ inj₁ , f ∘ inj₂ ⟩
+    ; from = λ{⟨ f , _ ⟩ (inj₁ a) → f a ; ⟨ _ , g ⟩ (inj₂ b) → g b}
+    ; from∘to = λ{f → extensionality λ{(inj₁ a) → refl ; (inj₂ b) → refl}}
+    ; to∘from = λ{⟨ f , g ⟩ → refl}
+    }
+
+→-distrib-× : ∀ {A B C : Set} → (A → B × C) ≃ ((A → B) × (A → C))
+→-distrib-× =
+  record
+    { to = λ f → ⟨ proj₁ ∘ f , proj₂ ∘ f ⟩
+    ; from = λ{⟨ g , h ⟩ a → ⟨ g a , h a ⟩}
+    ; from∘to = λ f → extensionality (η-× ∘ f)
+    ; to∘from = λ{⟨ g , h ⟩ → refl}
+    }
+
+×-distrib-⊎ : ∀ {A B C : Set} → (A ⊎ B) × C ≃ (A × C) ⊎ (B × C)
+×-distrib-⊎ =
+  record
+    { to = λ {⟨ inj₁ a , c ⟩ → inj₁ ⟨ a , c ⟩ ; ⟨ inj₂ b , c ⟩ → inj₂ ⟨ b , c ⟩}
+    ; from = λ{(inj₁ ⟨ a , c ⟩) → ⟨ inj₁ a , c ⟩ ; (inj₂ ⟨ b , c ⟩) → ⟨ inj₂ b , c ⟩}
+    ; from∘to = λ{⟨ inj₁ a , c ⟩ → refl ; ⟨ inj₂ b , c ⟩ → refl}
+    ; to∘from = λ{(inj₁ ⟨ a , c ⟩) → refl ; (inj₂ ⟨ b , c ⟩) → refl}
+    }
+
+⊎-distrib-× : ∀ {A B C : Set} → (A × B) ⊎ C ≲ (A ⊎ C) × (B ⊎ C)
+⊎-distrib-× =
+  record
+    { to = λ {(inj₁ ⟨ a , b ⟩) → ⟨ inj₁ a , inj₁ b ⟩ ; (inj₂ c) → ⟨ inj₂ c , inj₂ c ⟩}
+    ; from = λ {⟨ inj₁ a , inj₁ b ⟩ → inj₁ ⟨ a , b ⟩ ; ⟨ _ , inj₂ c ⟩ → inj₂ c ; ⟨ inj₂ c , _ ⟩ → inj₂ c}
+    ; from∘to = λ{(inj₁ ⟨ a , b ⟩) → refl ; (inj₂ c) → refl}
+    }
+
+-- Weak distributive law
+
+⊎-weak-× : ∀ {A B C : Set} → (A ⊎ B) × C → A ⊎ (B × C)
+⊎-weak-× ⟨ inj₁ a , c ⟩ = inj₁ a
+⊎-weak-× ⟨ inj₂ b , c ⟩ = inj₂ ⟨ b , c ⟩
+
+⊎×-implies-×⊎ : ∀ {A B C D : Set} → (A × B) ⊎ (C × D) → (A ⊎ C) × (B ⊎ D)
+⊎×-implies-×⊎ (inj₁ ⟨ a , b ⟩) = ⟨ inj₁ a , inj₁ b ⟩
+⊎×-implies-×⊎ (inj₂ ⟨ c , d ⟩) = ⟨ inj₂ c , inj₂ d ⟩
