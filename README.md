@@ -8,3 +8,4 @@ I'm progressing through PLFA and writing these proofs.
 * [x] Equality
 * [x] Isomorphism
   * [x] + ℕ-CanBin isomorphism
+* [ ] Connectives
