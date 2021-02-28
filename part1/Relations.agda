@@ -186,8 +186,8 @@ data One where
 
 data Can : Bin → Set
 data Can where
-  zero        : Can (⟨⟩ O)
-  leading-one : ∀ {b : Bin} → One b → Can b
+  zero  : Can (⟨⟩ O)
+  l-one : ∀ {b : Bin} → One b → Can b
 
 one-inc-one : ∀ {b : Bin} → One b → One (inc b)
 one-inc-one one = one-O one
@@ -195,8 +195,8 @@ one-inc-one (one-O h) = one-I h
 one-inc-one (one-I h) = one-O (one-inc-one h)
 
 can-inc-can : ∀ {b : Bin} → Can b → Can (inc b)
-can-inc-can zero = leading-one one
-can-inc-can (leading-one h) = leading-one (one-inc-one h)
+can-inc-can zero = l-one one
+can-inc-can (l-one h) = l-one (one-inc-one h)
 
 to-can : ∀ (n : ℕ) → Can (to n)
 to-can zero = zero
@@ -205,17 +205,17 @@ to-can (suc n) = can-inc-can (to-can n)
 _+ᵇ_ : Bin → Bin → Bin
 infixl 6 _+ᵇ_
 ⟨⟩    +ᵇ c     = c
-(b O) +ᵇ ⟨⟩    = (b O)
+(b O) +ᵇ ⟨⟩    = b O
 (b O) +ᵇ (c O) = (b +ᵇ c) O
 (b O) +ᵇ (c I) = (b +ᵇ c) I
-(b I) +ᵇ ⟨⟩    = (b I)
+(b I) +ᵇ ⟨⟩    = b I
 (b I) +ᵇ (c O) = (b +ᵇ c) I
 (b I) +ᵇ (c I) = (inc (b +ᵇ c)) O
 
 +ᵇ-identityˡ : ∀ (b : Bin) → Can b → ⟨⟩ O +ᵇ b ≡ b
 +ᵇ-identityˡ (⟨⟩ O) zero = refl
-+ᵇ-identityˡ (b O) (leading-one _) = refl
-+ᵇ-identityˡ (b I) (leading-one _) = refl
++ᵇ-identityˡ (b O) (l-one _) = refl
++ᵇ-identityˡ (b I) (l-one _) = refl
 
 +ᵇ-incʳ : ∀ (b c : Bin) → inc b +ᵇ c ≡ inc (b +ᵇ c)
 +ᵇ-incʳ ⟨⟩ ⟨⟩ = refl
@@ -256,6 +256,6 @@ one-to-from-identity {b I} (one-I h)
         | +ᵇ-O h
   = refl
 
-can-to-from-identity : ∀ {b : Bin} → Can b → to (from b) ≡ b
-can-to-from-identity zero = refl
-can-to-from-identity {b} (leading-one x) = one-to-from-identity x
+can-to-from-identity : ∀ (b : Bin) → Can b → to (from b) ≡ b
+can-to-from-identity _ zero = refl
+can-to-from-identity b (l-one x) = one-to-from-identity x

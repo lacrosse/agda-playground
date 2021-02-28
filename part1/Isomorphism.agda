@@ -204,13 +204,22 @@ open _⇔_
 
 -- Bin-embedding
 
-open import part1._Bin using (Bin; ⟨⟩; _I; _O) renaming (from to from-bin; to to to-bin)
+open import part1._Bin using (Bin; ⟨⟩; _I; _O) renaming (inc to incᵇ; from to fromᵇ; to to toᵇ)
 open import part1.Induction using (from-to-identity)
 
 ℕ-≤-Bin : ℕ ≤ Bin
 ℕ-≤-Bin =
   record
-    { to = to-bin
-    ; from = from-bin
+    { to = toᵇ
+    ; from = fromᵇ
     ; from∘to = from-to-identity
     }
+
+-- Let's push it
+
+open import part1.Relations using (Can; One; _+ᵇ_; to-can; can-to-from-identity; one-inc-one; to-distrib-+-+ᵇ; +ᵇ-O)
+open Can
+open One
+
+data CanBin : Set where
+  canb : ∀ (b : Bin) → Can b → CanBin
