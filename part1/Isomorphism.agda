@@ -223,3 +223,86 @@ open One
 
 data CanBin : Set where
   canb : ∀ (b : Bin) → Can b → CanBin
+
++ᵇ-comm : ∀ (b c : Bin) → b +ᵇ c ≡ c +ᵇ b
++ᵇ-comm ⟨⟩ ⟨⟩ = refl
++ᵇ-comm ⟨⟩ (c O) = refl
++ᵇ-comm ⟨⟩ (c I) = refl
++ᵇ-comm (b O) ⟨⟩ = refl
++ᵇ-comm (b I) ⟨⟩ = refl
++ᵇ-comm (b O) (c O) = cong _O (+ᵇ-comm b c)
++ᵇ-comm (b O) (c I) = cong _I (+ᵇ-comm b c)
++ᵇ-comm (b I) (c O) = cong _I (+ᵇ-comm b c)
++ᵇ-comm (b I) (c I) = cong _O (cong incᵇ (+ᵇ-comm b c))
+
++ᵇ-one : ∀ {b c : Bin} → One b → One c → One (b +ᵇ c)
++ᵇ-one       one        one                             = one-O one
++ᵇ-one       one        (one-O h2)                      = one-I h2
++ᵇ-one       one        (one-I h2)                      = one-O (one-inc-one h2)
++ᵇ-one {b O} (one-O h1) one        rewrite +ᵇ-comm b ⟨⟩ = one-I h1
++ᵇ-one {b I} (one-I h1) one        rewrite +ᵇ-comm b ⟨⟩ = one-O (one-inc-one h1)
++ᵇ-one       (one-O h1) (one-O h2)                      = one-O (+ᵇ-one h1 h2)
++ᵇ-one       (one-O h1) (one-I h2)                      = one-I (+ᵇ-one h1 h2)
++ᵇ-one       (one-I h1) (one-O h2)                      = one-I (+ᵇ-one h1 h2)
++ᵇ-one       (one-I h1) (one-I h2)                      = one-O (one-inc-one (+ᵇ-one h1 h2))
+
++ᵇ-can : ∀ {b c : Bin} → Can b → Can c → Can (b +ᵇ c)
++ᵇ-can        (l-one o1)  (l-one o2)                              = l-one (+ᵇ-one o1 o2)
++ᵇ-can        zero        zero                                    = zero
++ᵇ-can        zero        (l-one one)                             = l-one one
++ᵇ-can        zero        (l-one (one-O h2))                      = l-one (one-O h2)
++ᵇ-can        zero        (l-one (one-I h2))                      = l-one (one-I h2)
++ᵇ-can {b O}  (l-one o1)  zero               rewrite +ᵇ-comm b ⟨⟩ = l-one o1
++ᵇ-can {b I}  (l-one o1)  zero               rewrite +ᵇ-comm b ⟨⟩ = l-one o1
+
+_+ᶜ_ : CanBin → CanBin → CanBin
+canb k ck +ᶜ canb d cd = canb _ (+ᵇ-can ck cd)
+infixl 6 _+ᶜ_
+
+toᶜ : ℕ → CanBin
+toᶜ n = canb _ (to-can n)
+
+fromᵇᶜ : Bin → CanBin
+fromᵇᶜ = toᶜ ∘ fromᵇ
+
+fromᶜ : CanBin → ℕ
+fromᶜ (canb b _) = fromᵇ b
+
+toᵇᶜ : CanBin → Bin
+toᵇᶜ (canb b _) = b
+
+≡-one : ∀ {b : Bin} {h1 h2 : One b} → h1 ≡ h2
+≡-one {⟨⟩ I} {one} {one} = refl
+≡-one {_} {one-O h1} {one-O h2} = cong one-O ≡-one
+≡-one {_} {one-I h1} {one-I h2} = cong one-I ≡-one
+
+≡-can : ∀ {b : Bin} {h1 h2 : Can b} → h1 ≡ h2
+≡-can {b} {l-one h1} {l-one h2} = cong l-one ≡-one
+≡-can {⟨⟩ O} {zero} {zero} = refl
+≡-can {⟨⟩ O} {zero} {l-one (one-O ())}
+≡-can {⟨⟩ O} {l-one (one-O ())} {zero}
+
+simpl : ∀ {b c : Bin} → ∀ {cb : Can b} {cc : Can c} → b ≡ c → canb b cb ≡ canb c cc
+simpl refl = cong (canb _) ≡-can
+
+-- CanBin embeds in Bin
+
+open import Data.Nat.Properties using (+-identityʳ)
+
+to-double-from : ∀ (b : Bin) → One b → toᵇ (fromᵇ b + fromᵇ b) ≡ b O
+to-double-from b h
+  rewrite to-distrib-+-+ᵇ (fromᵇ b) (fromᵇ b)
+        | can-to-from-identity b (l-one h)
+  = +ᵇ-O h
+
+inc-to-double-from : ∀ (b : Bin) → One b → incᵇ (toᵇ (fromᵇ b + fromᵇ b)) ≡ b I
+inc-to-double-from b h rewrite to-double-from b h = refl
+
+fromᵇᶜ-toᵇᶜ-identity : ∀ (c : CanBin) → (fromᵇᶜ ∘ toᵇᶜ) c ≡ c
+fromᵇᶜ-toᵇᶜ-identity (canb (b O) (l-one (one-O ob))) rewrite +-identityʳ (fromᵇ b) = simpl (to-double-from b ob)
+fromᵇᶜ-toᵇᶜ-identity (canb (b I) (l-one (one-I ob))) rewrite +-identityʳ (fromᵇ b) = simpl (inc-to-double-from b ob)
+fromᵇᶜ-toᵇᶜ-identity (canb (⟨⟩ O) zero) = refl
+fromᵇᶜ-toᵇᶜ-identity (canb (⟨⟩ I) (l-one one)) = refl
+
+CanBin-≤-Bin : CanBin ≤ Bin
+CanBin-≤-Bin = record { to = toᵇᶜ ; from = fromᵇᶜ ; from∘to = fromᵇᶜ-toᵇᶜ-identity }
