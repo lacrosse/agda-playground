@@ -125,3 +125,48 @@ truth′ = _
   ≃⟨ ⊤-identityˡ ⟩
     A
   ≃-∎
+
+-- Disjunction
+
+data _⊎_ (A B : Set) : Set where
+  inj₁ : A → A ⊎ B
+  inj₂ : B → A ⊎ B
+
+case-⊎ : ∀ {A B C : Set} → (A → C) → (B → C) → A ⊎ B → C
+case-⊎ a→c _   (inj₁ a) = a→c a
+case-⊎ _   b→c (inj₂ b) = b→c b
+
+η-⊎ : ∀ {A B : Set} (w : A ⊎ B) → case-⊎ inj₁ inj₂ w ≡ w
+η-⊎ (inj₁ a) = refl
+η-⊎ (inj₂ b) = refl
+
+uniq-⊎ : ∀ {A B C : Set} (h : A ⊎ B → C) (w : A ⊎ B) → case-⊎ (h ∘ inj₁) (h ∘ inj₂) w ≡ h w
+uniq-⊎ h (inj₁ a) = refl
+uniq-⊎ h (inj₂ b) = refl
+
+infixr 1 _⊎_
+
+⊎-count : Bool ⊎ Tri → ℕ
+⊎-count (inj₁ true) = 1
+⊎-count (inj₁ false) = 2
+⊎-count (inj₂ aa) = 3
+⊎-count (inj₂ bb) = 4
+⊎-count (inj₂ cc) = 5
+
+⊎-comm : ∀ {A B : Set} → A ⊎ B ≃ B ⊎ A
+⊎-comm =
+  record
+    { to = λ{(inj₁ a) → inj₂ a ; (inj₂ b) → inj₁ b}
+    ; from = λ{(inj₁ b) → inj₂ b ; (inj₂ a) → inj₁ a}
+    ; from∘to = λ{(inj₁ x) → refl ; (inj₂ x) → refl}
+    ; to∘from = λ{(inj₁ x) → refl ; (inj₂ x) → refl}
+    }
+
+⊎-assoc : ∀ {A B C : Set} → (A ⊎ B) ⊎ C ≃ A ⊎ (B ⊎ C)
+⊎-assoc =
+  record
+    { to = λ{(inj₁ (inj₁ a)) → inj₁ a ; (inj₁ (inj₂ b)) → inj₂ (inj₁ b) ; (inj₂ c) → inj₂ (inj₂ c)}
+    ; from = λ{(inj₁ a) → inj₁ (inj₁ a) ; (inj₂ (inj₁ b)) → inj₁ (inj₂ b) ; (inj₂ (inj₂ c)) → inj₂ c}
+    ; from∘to = λ{(inj₁ (inj₁ a)) → refl ; (inj₁ (inj₂ b)) → refl ; (inj₂ c) → refl}
+    ; to∘from = λ{(inj₁ a) → refl ; (inj₂ (inj₁ b)) → refl ; (inj₂ (inj₂ c)) → refl}
+    }
