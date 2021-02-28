@@ -306,3 +306,11 @@ fromᵇᶜ-toᵇᶜ-identity (canb (⟨⟩ I) (l-one one)) = refl
 
 CanBin-≤-Bin : CanBin ≤ Bin
 CanBin-≤-Bin = record { to = toᵇᶜ ; from = fromᵇᶜ ; from∘to = fromᵇᶜ-toᵇᶜ-identity }
+
+-- ℕ is isomorphic to CanBin
+
+canbin-to-from-identity : ∀ (c : CanBin) → (toᶜ ∘ fromᶜ) c ≡ c
+canbin-to-from-identity (canb b h) = fromᵇᶜ-toᵇᶜ-identity (canb b h)
+
+ℕ-≃-CanBin : ℕ ≃ CanBin
+ℕ-≃-CanBin = record { to = toᶜ ; from = fromᶜ ; from∘to = from-to-identity ; to∘from = canbin-to-from-identity }
