@@ -81,3 +81,34 @@ trichotomy (suc m) (suc n) = h (trichotomy m n)
 
 ⊎-dual-× : ∀ {A B : Set} → ¬ (A ⊎ B) ≃ (¬ A) × (¬ B)
 ⊎-dual-× = →-distrib-⊎
+
+-- Excluded middle
+
+em-irrefutable : ∀ {A : Set} → ¬ ¬ (A ⊎ ¬ A)
+em-irrefutable k = (k ∘ inj₂) (k ∘ inj₁)
+
+excluded-middle : ∀ {A : Set} → A ⊎ ¬ A
+excluded-middle = {!   !}
+
+¬¬-elim : ∀ {A : Set} → ¬ ¬ A → A
+¬¬-elim h = {!   !}
+
+peirce : ∀ {A B : Set} → ((A → B) → A) → A
+peirce = {!   !}
+
+→-⊎ : ∀ {A B : Set} → (A → B) → ¬ A ⊎ B
+→-⊎ = {!   !}
+
+de-morgan : ∀ {A B : Set} → ¬ (¬ A × ¬ B) → A ⊎ B
+de-morgan = {!   !}
+
+-- Stable
+
+Stable : Set → Set
+Stable A = ¬ ¬ A → A
+
+¬-stable : ∀ {A : Set} → Stable (¬ A)
+¬-stable = ¬¬¬-elim
+
+×-stable : ∀ {A B : Set} {sa : Stable A} {sb : Stable B} → Stable (A × B)
+×-stable = ¬¬-elim
