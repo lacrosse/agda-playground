@@ -106,78 +106,78 @@ open ≃-Reasoning
 
 -- Embedding
 
-infix 0 _≤_
-record _≤_ (A B : Set) : Set where
+infix 0 _≲_
+record _≲_ (A B : Set) : Set where
   field
     to      : A → B
     from    : B → A
     from∘to : ∀ (x : A) → (from ∘ to) x ≡ x
-open _≤_
+open _≲_
 
-≤-refl : ∀ {A : Set} → A ≤ A
-≤-refl =
+≲-refl : ∀ {A : Set} → A ≲ A
+≲-refl =
   record
     { to = λ x → x
     ; from = λ x → x
     ; from∘to = λ _ → refl }
 
-≤-trans : ∀ {A B C : Set} → A ≤ B → B ≤ C → A ≤ C
-≤-trans A≤B B≤C =
+≲-trans : ∀ {A B C : Set} → A ≲ B → B ≲ C → A ≲ C
+≲-trans A≲B B≲C =
   record
-    { to = to B≤C ∘ to A≤B
-    ; from = from A≤B ∘ from B≤C
+    { to = to B≲C ∘ to A≲B
+    ; from = from A≲B ∘ from B≲C
     ; from∘to = λ{x →
         begin
-          (from A≤B ∘ from B≤C ∘ to B≤C ∘ to A≤B) x
-        ≡⟨ cong (from A≤B) (from∘to B≤C (to A≤B x)) ⟩
-          (from A≤B ∘ to A≤B) x
-        ≡⟨ from∘to A≤B x ⟩
+          (from A≲B ∘ from B≲C ∘ to B≲C ∘ to A≲B) x
+        ≡⟨ cong (from A≲B) (from∘to B≲C (to A≲B x)) ⟩
+          (from A≲B ∘ to A≲B) x
+        ≡⟨ from∘to A≲B x ⟩
           x
         ∎
       }
     }
 
-≤-antisym : ∀ {A B : Set}
-  → (A≤B : A ≤ B)
-  → (B≤A : B ≤ A)
-  → (to A≤B ≡ from B≤A)
-  → (from A≤B ≡ to B≤A)
+≲-antisym : ∀ {A B : Set}
+  → (A≲B : A ≲ B)
+  → (B≲A : B ≲ A)
+  → (to A≲B ≡ from B≲A)
+  → (from A≲B ≡ to B≲A)
   → A ≃ B
-≤-antisym A≤B B≤A to≡from from≡to =
+≲-antisym A≲B B≲A to≡from from≡to =
   record
-    { to = to A≤B
-    ; from = from A≤B
-    ; from∘to = from∘to A≤B
+    { to = to A≲B
+    ; from = from A≲B
+    ; from∘to = from∘to A≲B
     ; to∘from = λ{y →
         begin
-          (to A≤B ∘ from A≤B) y
-        ≡⟨ cong (to A≤B) (cong-app from≡to y) ⟩
-          (to A≤B ∘ to B≤A) y
-        ≡⟨ cong-app to≡from (to B≤A y) ⟩
-          (from B≤A ∘ to B≤A) y
-        ≡⟨ from∘to B≤A y ⟩
+          (to A≲B ∘ from A≲B) y
+        ≡⟨ cong (to A≲B) (cong-app from≡to y) ⟩
+          (to A≲B ∘ to B≲A) y
+        ≡⟨ cong-app to≡from (to B≲A y) ⟩
+          (from B≲A ∘ to B≲A) y
+        ≡⟨ from∘to B≲A y ⟩
           y
         ∎
       }
     }
 
-module ≤-Reasoning where
-  infix 1 ≤-begin_
-  infixr 2 _≤⟨_⟩_
-  infix 3 _≤-∎
+module ≲-Reasoning where
+  infix 1 ≲-begin_
+  infixr 2 _≲⟨_⟩_
+  infix 3 _≲-∎
 
-  ≤-begin_ : ∀ {A B : Set} → A ≤ B → A ≤ B
-  ≤-begin A≤B = A≤B
+  ≲-begin_ : ∀ {A B : Set} → A ≲ B → A ≲ B
+  ≲-begin A≲B = A≲B
 
-  _≤⟨_⟩_ : ∀ (A : Set) {B C : Set} → A ≤ B → B ≤ C → A ≤ C
-  A ≤⟨ A≤B ⟩ B≤C = ≤-trans A≤B B≤C
+  _≲⟨_⟩_ : ∀ (A : Set) {B C : Set} → A ≲ B → B ≲ C → A ≲ C
+  A ≲⟨ A≲B ⟩ B≲C = ≲-trans A≲B B≲C
 
-  _≤-∎ : ∀ (A : Set) → A ≤ A
-  A ≤-∎ = ≤-refl
-open ≤-Reasoning
+  _≲-∎ : ∀ (A : Set) → A ≲ A
+  A ≲-∎ = ≲-refl
+open ≲-Reasoning
 
-≃-implies-≤ : ∀ {A B : Set} → A ≃ B → A ≤ B
-≃-implies-≤ A≃B =
+≃-implies-≲ : ∀ {A B : Set} → A ≃ B → A ≲ B
+≃-implies-≲ A≃B =
   record
     { to = to A≃B
     ; from = from A≃B
@@ -207,8 +207,8 @@ open _⇔_
 open import part1._Bin using (Bin; ⟨⟩; _I; _O) renaming (inc to incᵇ; from to fromᵇ; to to toᵇ)
 open import part1.Induction using (from-to-identity)
 
-ℕ-≤-Bin : ℕ ≤ Bin
-ℕ-≤-Bin =
+ℕ-≲-Bin : ℕ ≲ Bin
+ℕ-≲-Bin =
   record
     { to = toᵇ
     ; from = fromᵇ
@@ -304,8 +304,8 @@ fromᵇᶜ-toᵇᶜ-identity (canb (b I) (l-one (one-I ob))) rewrite +-identity�
 fromᵇᶜ-toᵇᶜ-identity (canb (⟨⟩ O) zero) = refl
 fromᵇᶜ-toᵇᶜ-identity (canb (⟨⟩ I) (l-one one)) = refl
 
-CanBin-≤-Bin : CanBin ≤ Bin
-CanBin-≤-Bin = record { to = toᵇᶜ ; from = fromᵇᶜ ; from∘to = fromᵇᶜ-toᵇᶜ-identity }
+CanBin-≲-Bin : CanBin ≲ Bin
+CanBin-≲-Bin = record { to = toᵇᶜ ; from = fromᵇᶜ ; from∘to = fromᵇᶜ-toᵇᶜ-identity }
 
 -- ℕ is isomorphic to CanBin
 
@@ -314,3 +314,5 @@ canbin-to-from-identity (canb b h) = fromᵇᶜ-toᵇᶜ-identity (canb b h)
 
 ℕ-≃-CanBin : ℕ ≃ CanBin
 ℕ-≃-CanBin = record { to = toᶜ ; from = fromᶜ ; from∘to = from-to-identity ; to∘from = canbin-to-from-identity }
+
+import Function using (_∘_)
