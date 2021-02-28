@@ -214,7 +214,7 @@ uniq-⊥ _ ()
 η-→ f = refl
 
 →-count : (Bool → Tri) → ℕ
-→-count f with f true | f true
+→-count f with f true | f false
 ... | aa | aa = 1
 ... | aa | bb = 2
 ... | aa | cc = 3
