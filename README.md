@@ -9,4 +9,4 @@ I'm progressing through PLFA and writing these proofs.
 * [x] Isomorphism
   * [x] + ℕ-CanBin isomorphism
 * [x] Connectives
-* [ ] Negation
+* [x] Negation
