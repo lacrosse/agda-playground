@@ -51,3 +51,11 @@ id≡id′ = extensionality λ()
 
 assimilation : ∀ {A : Set} (¬x ¬x′ : ¬ A) → ¬x ≡ ¬x′
 assimilation ¬x _ = extensionality λ x → ⊥-elim (¬x x)
+
+-- Exercises
+
+open import part1.Relations using (_<_; _>_)
+open _<_
+
+<-irreflexive : ∀ {n : ℕ} → ¬ (n < n)
+<-irreflexive (s<s h) = <-irreflexive h
