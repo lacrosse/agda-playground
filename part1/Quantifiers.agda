@@ -1,7 +1,7 @@
 module part1.Quantifiers where
 
 import Relation.Binary.PropositionalEquality as Eq
-open Eq using (_≡_; refl)
+open Eq using (_≡_; refl; sym)
 open import Data.Nat using (ℕ; zero; suc; _+_; _*_)
 open import Relation.Nullary using (¬_)
 open import Data.Product using (_×_; proj₁; proj₂) renaming (_,_ to ⟨_,_⟩)
@@ -145,3 +145,33 @@ open import part1.Induction using (+-identityʳ; +-suc; +-comm; +-assoc)
     n+n-even : ∀ (n : ℕ) → even(n + n)
     n+n-even zero = zero
     n+n-even (suc n) rewrite +-suc n n = suc (suc (n+n-even n))
+
+-- Exercise ∃-|-≤
+open import Data.Nat using (_≤_)
+open import Agda.Builtin.Nat using (_-_)
+open _≤_
+
+-+suc≡suc : ∀ (m n : ℕ) → n ≤ m → m - n + suc n ≡ suc m
+-+suc≡suc m 0 z≤n rewrite +-comm m 1 = refl
+-+suc≡suc (suc m) (suc n) (s≤s n≤m)
+  rewrite +-suc (m - n) (suc n)
+  rewrite -+suc≡suc m n n≤m
+  = refl
+
+≤-implies-∃ : ∀ {y z : ℕ} → y ≤ z → (∃[ x ] (x + y ≡ z))
+≤-implies-∃ {_} {z} z≤n = ⟨ z , +-identityʳ z ⟩
+≤-implies-∃ {suc y} {suc z} (s≤s y≤z) = ⟨ z - y , -+suc≡suc z y y≤z ⟩
+
+≡-implies-≤ : ∀ {m n : ℕ} → m ≡ n → m ≤ n
+≡-implies-≤ {suc m} refl = s≤s (≡-implies-≤ refl)
+≡-implies-≤ {zero} refl = z≤n
+
+≤-+ : ∀ {m n : ℕ} → m ≤ n + m
+≤-+ {zero} {n} = z≤n
+≤-+ {suc m} {zero} = s≤s ≤-+
+≤-+ {suc m} {suc n} rewrite sym (+-assoc n 1 m) = s≤s ≤-+
+
+∃-implies-≤ : ∀ {y z : ℕ} → (∃[ x ] (x + y ≡ z)) → y ≤ z
+∃-implies-≤ ⟨ zero , refl ⟩ = ≡-implies-≤ refl
+∃-implies-≤ {zero} ⟨ suc x , refl ⟩ = z≤n
+∃-implies-≤ {suc y} ⟨ suc x , refl ⟩ rewrite sym (+-assoc x 1 y) = s≤s ≤-+
