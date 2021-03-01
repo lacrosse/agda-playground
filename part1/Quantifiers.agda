@@ -120,3 +120,28 @@ odd-∃ (suc en) with even-∃ en
 ∃-even ⟨ suc om , refl ⟩ = suc (∃-odd ⟨ om , refl ⟩)
 
 ∃-odd ⟨ om , refl ⟩ = suc (∃-even ⟨ om , refl ⟩)
+
+-- Exercise ∃-even-odd
+
+open import part1.Induction using (+-identityʳ; +-suc; +-comm; +-assoc)
+
+∃-even′ : ∀ {n : ℕ} → ∃[ m ] (2 * m     ≡ n) → even n
+∃-odd′  : ∀ {n : ℕ} → ∃[ m ] (2 * m + 1 ≡ n) → odd  n
+
+∃-even′ ⟨ zero , refl ⟩ = zero
+∃-even′ ⟨ suc om , refl ⟩ = suc (∃-odd′ ⟨ om , helper om ⟩)
+  where
+    helper : ∀ (n : ℕ) → n + (n + zero) + 1 ≡ n + suc (n + zero)
+    helper n
+      rewrite +-comm n 0
+            | +-comm (n + n) 1
+            | +-suc n n
+      = refl
+
+∃-odd′ ⟨ om , refl ⟩
+  rewrite +-identityʳ om | +-comm (om + om) 1
+  = suc (n+n-even om)
+  where
+    n+n-even : ∀ (n : ℕ) → even(n + n)
+    n+n-even zero = zero
+    n+n-even (suc n) rewrite +-suc n n = suc (suc (n+n-even n))
