@@ -7,7 +7,7 @@ open import Data.Nat using (ℕ; zero; suc; _≤_; z≤n; s≤s)
 open import Data.Product using (_×_) renaming (_,_ to ⟨_,_⟩)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Relation.Nullary using (¬_)
-open import Relation.Nullary.Negation renaming (contradiction to ¬¬-intro)
+open import Relation.Nullary.Negation using () renaming (contradiction to ¬¬-intro)
 open import Data.Unit using (⊤; tt)
 open import Data.Empty using (⊥; ⊥-elim)
 open import part1.Relations using (_<_; 0<s; s<s)
@@ -107,17 +107,17 @@ m ≤?′ n with m ≤ᵇ n | ≤ᵇ→≤ m n | ≤→≤ᵇ {m} {n}
 
 -- Erasure
 
-⌞_⌟ : ∀ {A : Set} → Dec A → Bool
-⌞ yes x ⌟ = true
-⌞ no  x ⌟ = false
+⌊_⌋ : ∀ {A : Set} → Dec A → Bool
+⌊ yes x ⌋ = true
+⌊ no  x ⌋ = false
 
 _≤ᵇ′_ : ℕ → ℕ → Bool
-m ≤ᵇ′ n = ⌞ m ≤? n ⌟
+m ≤ᵇ′ n = ⌊ m ≤? n ⌋
 
-to-witness : ∀ {A : Set} {D : Dec A} → T ⌞ D ⌟ → A
+to-witness : ∀ {A : Set} {D : Dec A} → T ⌊ D ⌋ → A
 to-witness {_} {yes x} _ = x
 
-from-witness : ∀ {A : Set} {D : Dec A} → A → T ⌞ D ⌟
+from-witness : ∀ {A : Set} {D : Dec A} → A → T ⌊ D ⌋
 from-witness {_} {yes _} _ = tt
 from-witness {_} {no ¬a} a = ¬a a
 
@@ -126,3 +126,50 @@ from-witness {_} {no ¬a} a = ¬a a
 
 ≤→≤ᵇ′ : ∀ {m n : ℕ} → m ≤ n → T (m ≤ᵇ′ n)
 ≤→≤ᵇ′ = from-witness
+
+-- Logical connectives
+
+infixr 6 _∧_
+
+_∧_ : Bool → Bool → Bool
+true  ∧ b  = b
+false ∧ _  = false
+
+infixr 6 _×-dec_
+
+_×-dec_ : ∀ {A B : Set} → Dec A → Dec B → Dec (A × B)
+yes a ×-dec yes b = yes ⟨ a , b ⟩
+no ¬a ×-dec _     = no λ{⟨ a , _ ⟩ → ¬a a}
+_     ×-dec no ¬b = no λ{⟨ _ , b ⟩ → ¬b b}
+
+infixr 5 _∨_
+
+_∨_ : Bool → Bool → Bool
+false ∨ false = false
+false ∨ true  = true
+true  ∨ _     = true
+
+infixr 5 _⊎-dec_
+
+_⊎-dec_ : ∀ {A B : Set} → Dec A → Dec B → Dec (A ⊎ B)
+no ¬a ⊎-dec no ¬b = no λ{(inj₁ a) → ¬a a ; (inj₂ b) → ¬b b}
+yes a ⊎-dec _     = yes (inj₁ a)
+_     ⊎-dec yes b = yes (inj₂ b)
+
+not : Bool → Bool
+not true  = false
+not false = true
+
+¬? : ∀ {A : Set} → Dec A → Dec (¬ A)
+¬? (yes a)  = no (λ ¬a → ¬a a)
+¬? (no  ¬a) = yes ¬a
+
+_⊃_ : Bool → Bool → Bool
+true  ⊃ false = false
+false ⊃ _     = true
+_     ⊃ true  = true
+
+_→-dec_ : ∀ {A B : Set} → Dec A → Dec B → Dec (A → B)
+yes a →-dec no ¬b = no  λ a→b → ¬b (a→b a)
+no ¬a →-dec _     = yes λ a   → ⊥-elim (¬a a)
+_     →-dec yes b = yes λ _   → b
