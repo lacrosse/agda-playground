@@ -231,3 +231,15 @@ _ = refl
 
 True : ∀ {Q} → Dec Q → Set
 True d = T ⌊ d ⌋
+
+-- Exercise False
+
+to-witness-false : ∀ {A : Set} {D : Dec A} → T ⌊ ¬? D ⌋ → ¬ A
+to-witness-false {_} {no ¬a} _ a = ¬a a
+
+from-witness-false : ∀ {A : Set} {D : Dec A} → ¬ A → T ⌊ ¬? D ⌋
+from-witness-false {_} {yes a} ¬a = ¬a a
+from-witness-false {_} {no _}  _  = tt
+
+False : ∀ {Q} → ¬ Dec Q → ¬ Set
+False ¬dq _ = (¬dq ∘ no) (¬dq ∘ yes)

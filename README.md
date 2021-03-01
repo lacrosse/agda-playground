@@ -12,7 +12,7 @@ I'm progressing through PLFA and writing these proofs.
   * [x] Connectives
   * [x] Negation
   * [x] Quantifiers
-  * [ ] Decidable
+  * [x] Decidable
   * [ ] Lists
 * [ ] Part 2
 * [ ] Part 3
