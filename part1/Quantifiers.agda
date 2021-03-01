@@ -99,3 +99,24 @@ syntax ∃-syntax (λ x → B) = ∃[ x ] B
     ; from∘to = λ{⟨ aa , Btri ⟩ → refl ; ⟨ bb , Btri ⟩ → refl ; ⟨ cc , Btri ⟩ → refl}
     ; to∘from = λ{(inj₁ Baa) → refl ; (inj₂ (inj₁ Bbb)) → refl ; (inj₂ (inj₂ Bcc)) → refl}
     }
+
+-- An existential example
+open import part1.Relations using (even; odd; zero; suc)
+
+even-∃ : ∀ {n : ℕ} → even n → ∃[ m ] (     m * 2 ≡ n)
+odd-∃  : ∀ {n : ℕ} → odd  n → ∃[ m ] ( 1 + m * 2 ≡ n)
+
+even-∃ zero = ⟨ zero , refl ⟩
+even-∃ (suc on) with odd-∃ on
+... | ⟨ m , refl ⟩ = ⟨ suc m , refl ⟩
+
+odd-∃ (suc en) with even-∃ en
+... | ⟨ m , refl ⟩ = ⟨ m , refl ⟩
+
+∃-even : ∀ {n : ℕ} → ∃[ m ] (    m * 2 ≡ n) → even n
+∃-odd  : ∀ {n : ℕ} → ∃[ m ] (1 + m * 2 ≡ n) → odd  n
+
+∃-even ⟨ zero , refl ⟩ = zero
+∃-even ⟨ suc om , refl ⟩ = suc (∃-odd ⟨ om , refl ⟩)
+
+∃-odd ⟨ om , refl ⟩ = suc (∃-even ⟨ om , refl ⟩)
