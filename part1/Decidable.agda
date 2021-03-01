@@ -173,3 +173,41 @@ _→-dec_ : ∀ {A B : Set} → Dec A → Dec B → Dec (A → B)
 yes a →-dec no ¬b = no  λ a→b → ¬b (a→b a)
 no ¬a →-dec _     = yes λ a   → ⊥-elim (¬a a)
 _     →-dec yes b = yes λ _   → b
+
+-- Exercise erasure
+∧-× : ∀ {A B : Set} (x : Dec A) (y : Dec B) → ⌊ x ⌋ ∧ ⌊ y ⌋ ≡ ⌊ x ×-dec y ⌋
+∧-× (no _)  _       = refl
+∧-× (yes _) (yes _) = refl
+∧-× (yes _) (no _)  = refl
+
+∨-⊎ : ∀ {A B : Set} (x : Dec A) (y : Dec B) → ⌊ x ⌋ ∨ ⌊ y ⌋ ≡ ⌊ x ⊎-dec y ⌋
+∨-⊎ (yes _) _       = refl
+∨-⊎ (no _)  (yes _) = refl
+∨-⊎ (no _)  (no _)  = refl
+
+not-¬ : ∀ {A : Set} (x : Dec A) → not ⌊ x ⌋ ≡ ⌊ ¬? x ⌋
+not-¬ (yes _) = refl
+not-¬ (no _)  = refl
+
+-- Exercise iff-erasure
+
+_iff_ : Bool → Bool → Bool
+true  iff true  = true
+true  iff false = false
+false iff true  = false
+false iff false = true
+
+open _⇔_
+open import Function using (_∘_)
+
+_⇔-dec_ : ∀ {A B : Set} → Dec A → Dec B → Dec (A ⇔ B)
+yes a ⇔-dec yes b = yes (record { to = λ _ → b ; from = λ _ → a })
+yes a ⇔-dec no ¬b = no (λ a⇔b → ¬b (to   a⇔b a))
+no ¬a ⇔-dec yes b = no (λ a⇔b → ¬a (from a⇔b b))
+no ¬a ⇔-dec no ¬b = yes (record { to = ⊥-elim ∘ ¬a ; from = ⊥-elim ∘ ¬b })
+
+iff-⇔ : ∀ {A B : Set} (x : Dec A) (y : Dec B) → ⌊ x ⌋ iff ⌊ y ⌋ ≡ ⌊ x ⇔-dec y ⌋
+iff-⇔ (yes _) (yes _) = refl
+iff-⇔ (yes _) (no _)  = refl
+iff-⇔ (no _)  (yes _) = refl
+iff-⇔ (no _)  (no _)  = refl
