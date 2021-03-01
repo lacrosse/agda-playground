@@ -175,3 +175,22 @@ open _≤_
 ∃-implies-≤ ⟨ zero , refl ⟩ = ≡-implies-≤ refl
 ∃-implies-≤ {zero} ⟨ suc x , refl ⟩ = z≤n
 ∃-implies-≤ {suc y} ⟨ suc x , refl ⟩ rewrite sym (+-assoc x 1 y) = s≤s ≤-+
+
+-- Existentials, universals and negation
+
+open import Data.Empty using (⊥-elim)
+
+¬∃≃∀¬ : ∀ {A : Set} {B : A → Set} → (¬ ∃[ x ] B x) ≃ (∀ x → ¬ B x)
+¬∃≃∀¬ =
+  record
+    { to = λ ¬∃B a Ba → ¬∃B ⟨ a , Ba ⟩
+    ; from = λ{∀¬B ⟨ a , Ba ⟩ → ∀¬B a Ba}
+    ; from∘to = λ ¬∃B → ∀-extensionality (⊥-elim ∘ ¬∃B)
+    ; to∘from = λ ∀¬B → refl
+    }
+
+-- Exercise ∃¬-implies-¬∀
+∃¬-implies-¬∀ : ∀ {A : Set} {B : A → Set} → ∃[ x ] (¬ B x) → ¬ (∀ x → B x)
+∃¬-implies-¬∀ ⟨ a , ¬Ba ⟩ ∀B = ¬Ba (∀B a)
+
+-- The converse doesn't hold.
