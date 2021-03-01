@@ -1,7 +1,7 @@
 module part1.Decidable where
 
 import Relation.Binary.PropositionalEquality as Eq
-open Eq using (_≡_; refl)
+open Eq using (_≡_; _≢_; cong; refl)
 open Eq.≡-Reasoning
 open import Data.Nat using (ℕ; zero; suc; _≤_; z≤n; s≤s)
 open import Data.Product using (_×_) renaming (_,_ to ⟨_,_⟩)
@@ -78,3 +78,22 @@ zero  <? suc n = yes 0<s
 suc m <? suc n with m <? n
 ... | yes m<n  = yes (s<s m<n)
 ... | no  ¬m<n = no (¬s<s ¬m<n)
+
+-- _≡ℕ?_
+
+z≢s : ∀ {n : ℕ} → suc n ≢ zero
+z≢s ()
+
+s≢z : ∀ {n : ℕ} → zero ≢ suc n
+s≢z ()
+
+s≢s : ∀ {m n : ℕ} → m ≢ n → suc m ≢ suc n
+s≢s m≢n refl = m≢n refl
+
+_≡ℕ?_ : ∀ (m n : ℕ) → Dec (m ≡ n)
+zero ≡ℕ? zero = yes refl
+suc m ≡ℕ? zero = no z≢s
+zero ≡ℕ? suc n = no s≢z
+suc m ≡ℕ? suc n with m ≡ℕ? n
+... | yes m≡n  = yes (cong suc m≡n)
+... | no  ¬m≡n = no  (s≢s ¬m≡n)
