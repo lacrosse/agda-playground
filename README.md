@@ -11,7 +11,7 @@ I'm progressing through PLFA and writing these proofs.
     * [x] + ℕ-CanBin isomorphism
   * [x] Connectives
   * [x] Negation
-  * [ ] Quantifiers
+  * [x] Quantifiers
   * [ ] Decidable
   * [ ] Lists
 * [ ] Part 2

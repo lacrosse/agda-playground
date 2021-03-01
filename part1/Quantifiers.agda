@@ -194,3 +194,17 @@ open import Data.Empty using (⊥-elim)
 ∃¬-implies-¬∀ ⟨ a , ¬Ba ⟩ ∀B = ¬Ba (∀B a)
 
 -- The converse doesn't hold.
+
+-- Bin-isomorphism
+-- Already solved in the Isomorphism chapter.
+-- Here's the adaptation to the existential form:
+
+open import part1._Bin using (Bin)
+open import part1.Relations using (Can)
+open import part1.Isomorphism using (≃-trans; ℕ-≃-CanBin; canb)
+open Can
+
+ΣBinCan = ∃[ b ] (Can b)
+
+ℕ-≃-ΣBinCan : ℕ ≃ ΣBinCan
+ℕ-≃-ΣBinCan = ≃-trans ℕ-≃-CanBin (record { to = λ{(canb b cb) → ⟨ b , cb ⟩} ; from = λ{⟨ b , cb ⟩ → canb b cb} ; from∘to = λ{(canb b cb) → refl} ; to∘from = λ{⟨ x , x₁ ⟩ → refl} })
