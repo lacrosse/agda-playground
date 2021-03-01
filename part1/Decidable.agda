@@ -211,3 +211,23 @@ iff-⇔ (yes _) (yes _) = refl
 iff-⇔ (yes _) (no _)  = refl
 iff-⇔ (no _)  (yes _) = refl
 iff-⇔ (no _)  (no _)  = refl
+
+-- Proof by reflection
+
+-- Guarded minus
+
+minus : (m n : ℕ) (n≤m : n ≤ m) → ℕ
+minus m       zero    _ = m
+minus (suc m) (suc n) (s≤s h) = minus m n h
+
+_ : minus 5 3 (s≤s (s≤s (s≤s z≤n))) ≡ 2
+_ = refl
+
+_-_ : (m n : ℕ) {n≤m : T ⌊ n ≤? m ⌋} → ℕ
+_-_ m n {n≤m} = minus m n (to-witness n≤m)
+
+_ : 5 - 3 ≡ 2
+_ = refl
+
+True : ∀ {Q} → Dec Q → Set
+True d = T ⌊ d ⌋
