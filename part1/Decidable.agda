@@ -97,3 +97,32 @@ zero ≡ℕ? suc n = no s≢z
 suc m ≡ℕ? suc n with m ≡ℕ? n
 ... | yes m≡n  = yes (cong suc m≡n)
 ... | no  ¬m≡n = no  (s≢s ¬m≡n)
+
+-- Decidables ⇔ booleans
+
+_≤?′_ : ∀ (m n : ℕ) → Dec (m ≤ n)
+m ≤?′ n with m ≤ᵇ n | ≤ᵇ→≤ m n | ≤→≤ᵇ {m} {n}
+... | true  | b→≤ | _   = yes (b→≤ tt)
+... | false | g   | ≤→b = no ≤→b
+
+-- Erasure
+
+⌞_⌟ : ∀ {A : Set} → Dec A → Bool
+⌞ yes x ⌟ = true
+⌞ no  x ⌟ = false
+
+_≤ᵇ′_ : ℕ → ℕ → Bool
+m ≤ᵇ′ n = ⌞ m ≤? n ⌟
+
+to-witness : ∀ {A : Set} {D : Dec A} → T ⌞ D ⌟ → A
+to-witness {_} {yes x} _ = x
+
+from-witness : ∀ {A : Set} {D : Dec A} → A → T ⌞ D ⌟
+from-witness {_} {yes _} _ = tt
+from-witness {_} {no ¬a} a = ¬a a
+
+≤ᵇ′→≤ : ∀ {m n : ℕ} → T (m ≤ᵇ′ n) → m ≤ n
+≤ᵇ′→≤ = to-witness
+
+≤→≤ᵇ′ : ∀ {m n : ℕ} → m ≤ n → T (m ≤ᵇ′ n)
+≤→≤ᵇ′ = from-witness
