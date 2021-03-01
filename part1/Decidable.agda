@@ -1,0 +1,80 @@
+module part1.Decidable where
+
+import Relation.Binary.PropositionalEquality as Eq
+open Eq using (_≡_; refl)
+open Eq.≡-Reasoning
+open import Data.Nat using (ℕ; zero; suc; _≤_; z≤n; s≤s)
+open import Data.Product using (_×_) renaming (_,_ to ⟨_,_⟩)
+open import Data.Sum using (_⊎_; inj₁; inj₂)
+open import Relation.Nullary using (¬_)
+open import Relation.Nullary.Negation renaming (contradiction to ¬¬-intro)
+open import Data.Unit using (⊤; tt)
+open import Data.Empty using (⊥; ⊥-elim)
+open import part1.Relations using (_<_; 0<s; s<s)
+open import part1.Isomorphism using (_⇔_)
+
+-- Evidence vs computation
+
+data Bool : Set where
+  true  : Bool
+  false : Bool
+
+infix 4 _≤ᵇ_
+_≤ᵇ_ : ℕ → ℕ → Bool
+zero  ≤ᵇ _     = true
+suc m ≤ᵇ zero  = false
+suc m ≤ᵇ suc n = m ≤ᵇ n
+
+-- Relating evidence and computation
+
+T : Bool → Set
+T true  = ⊤
+T false = ⊥
+
+T→≡ : ∀ (b : Bool) → T b → b ≡ true
+T→≡ true tt = refl
+
+≡→T : ∀ {b : Bool} → b ≡ true → T b
+≡→T refl = tt
+
+≤ᵇ→≤ : ∀ (m n : ℕ) → T (m ≤ᵇ n) → m ≤ n
+≤ᵇ→≤ zero    _       tt = z≤n
+≤ᵇ→≤ (suc m) (suc n) t  = s≤s (≤ᵇ→≤ m n t)
+
+≤→≤ᵇ : ∀ {m n : ℕ} → m ≤ n → T (m ≤ᵇ n)
+≤→≤ᵇ z≤n     = tt
+≤→≤ᵇ (s≤s t) = ≤→≤ᵇ t
+
+-- The best of both
+
+data Dec (A : Set) : Set where
+  yes :   A → Dec A
+  no  : ¬ A → Dec A
+
+¬s≤z : ∀ {m : ℕ} → ¬ (suc m ≤ zero)
+¬s≤z ()
+
+¬s≤s : ∀ {m n : ℕ} → ¬ (m ≤ n) → ¬ (suc m ≤ suc n)
+¬s≤s ¬m≤n (s≤s m≤n) = ¬m≤n m≤n
+
+_≤?_ : ∀ (m n : ℕ) → Dec (m ≤ n)
+zero  ≤? _     = yes z≤n
+suc m ≤? zero  = no ¬s≤z
+suc m ≤? suc n with m ≤? n
+... | yes  m≤n = yes (s≤s m≤n)
+... | no  ¬m≤n = no (¬s≤s ¬m≤n)
+
+-- Exercises
+
+¬n<z : ∀ {n : ℕ} → ¬ (n < zero)
+¬n<z ()
+
+¬s<s : ∀ {m n : ℕ} → ¬ (m < n) → ¬ (suc m < suc n)
+¬s<s ¬m<n (s<s m<n) = ¬m<n m<n
+
+_<?_ : ∀ (m n : ℕ) → Dec (m < n)
+_     <? zero  = no ¬n<z
+zero  <? suc n = yes 0<s
+suc m <? suc n with m <? n
+... | yes m<n  = yes (s<s m<n)
+... | no  ¬m<n = no (¬s<s ¬m<n)
