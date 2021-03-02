@@ -337,3 +337,31 @@ foldr-monoid-foldl _⊗_ e ⊗-monoid (x ∷ xs)
   rewrite identityˡ ⊗-monoid x
         | foldl-monoid _⊗_ e ⊗-monoid xs x
   = cong (x ⊗_) (foldr-monoid-foldl _⊗_ e ⊗-monoid xs)
+
+-- All
+
+data All {A : Set} (P : A → Set) : List A → Set where
+  []  : All P []
+  _∷_ : ∀ {x : A} {xs : List A} → P x → All P xs → All P (x ∷ xs)
+
+_ : All (_≤ 2) [ 0 , 1 , 2 ]
+_ = z≤n ∷ s≤s z≤n ∷ s≤s (s≤s z≤n) ∷ []
+
+data Any {A : Set} (P : A → Set) : List A → Set where
+  here  : ∀ {x : A} {xs : List A} → P x      → Any P (x ∷ xs)
+  there : ∀ {x : A} {xs : List A} → Any P xs → Any P (x ∷ xs)
+
+infix 4 _∈_ _∉_
+
+_∈_ : ∀ {A : Set} (x : A) (xs : List A) → Set
+x ∈ xs = Any (x ≡_) xs
+
+_∉_ : ∀ {A : Set} (x : A) (xs : List A) → Set
+x ∉ xs = ¬ (x ∈ xs)
+
+_ : 0 ∈ first-ℕ 93
+_ = here refl
+
+not-in : 1 ∉ first-ℕ 1
+not-in (here ())
+not-in (there ())
