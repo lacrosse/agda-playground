@@ -241,3 +241,39 @@ map-is-fold-Tree-tree fl fn (node left b right)
 
 map-is-fold-Tree : ∀ {A B C D : Set} {fl : A → C} {fn : B → D} → map-Tree fl fn ≡ fold-Tree (λ a → leaf (fl a)) (λ left b right → node left (fn b) right)
 map-is-fold-Tree = extensionality (map-is-fold-Tree-tree _ _)
+
+-- sum-downFrom
+
+downFrom : ℕ → List ℕ
+downFrom zero = []
+downFrom (suc n) = n ∷ downFrom n
+
+open Data.Nat.Properties using (*-comm; +-comm; *-distribʳ-+; *-distribˡ-∸; *-identityʳ; +-∸-assoc; m+n∸m≡n; m≤m+n; m≤m*n; _<?_)
+open Data.Nat using (_<_)
+
+n≤n : ∀ {n : ℕ} → n ≤ n
+n≤n {zero} = z≤n
+n≤n {suc n} = s≤s n≤n
+
+n≤n*n : ∀ (n : ℕ) → n ≤ n * n
+n≤n*n (zero) = z≤n
+n≤n*n (suc n) = s≤s (m≤m+n n (n * suc n))
+
+0<2 : 0 < 2
+0<2 = s≤s z≤n
+
+sum-downFrom : ∀ (n : ℕ) → sum (downFrom n) * 2 ≡ n * (n ∸ 1)
+sum-downFrom zero = refl
+sum-downFrom (suc n)
+  rewrite *-distribʳ-+ 2 n (sum (downFrom n))
+        | sum-downFrom n
+        | *-distribˡ-∸ n n 1
+        | *-identityʳ n
+        | sym (+-∸-assoc (n * 2) (n≤n*n n))
+        | +-comm (n * 2) (n * n)
+        | +-comm n (n * n)
+        | +-∸-assoc (n * n) (m≤m*n n 0<2)
+        | *-comm n 2
+        | m+n∸m≡n n (n + 0)
+        | +-identityʳ n
+  = refl
