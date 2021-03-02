@@ -311,3 +311,29 @@ foldr-monoid-++ :
 foldr-monoid-++ _⊗_ e ⊗-monoid xs ys
   rewrite foldr-++ _⊗_ e xs ys
   = foldr-monoid _⊗_ e ⊗-monoid xs (foldr _⊗_ e ys)
+
+-- Foldl
+
+foldl : ∀ {A B : Set} → (B → A → B) → B → List A → B
+foldl _⊗_ e [] = e
+foldl _⊗_ e (x ∷ xs) = foldl _⊗_ (e ⊗ x) xs
+
+foldl-monoid :
+  ∀ {A : Set} (_⊗_ : A → A → A) (e : A) → IsMonoid _⊗_ e
+  → ∀ (xs : List A) (y : A) → foldl _⊗_ y xs ≡ y ⊗ foldl _⊗_ e xs
+foldl-monoid _⊗_ e ⊗-monoid [] y = sym (identityʳ ⊗-monoid y)
+foldl-monoid _⊗_ e ⊗-monoid (x ∷ xs) y
+  rewrite foldl-monoid _⊗_ e ⊗-monoid xs (y ⊗ x)
+        | identityˡ ⊗-monoid x
+        | foldl-monoid _⊗_ e ⊗-monoid xs x
+        | assoc ⊗-monoid y x (foldl _⊗_ e xs)
+  = refl
+
+foldr-monoid-foldl :
+  ∀ {A : Set} (_⊗_ : A → A → A) (e : A) → IsMonoid _⊗_ e
+  → ∀ (xs : List A) → foldr _⊗_ e xs ≡ foldl _⊗_ e xs
+foldr-monoid-foldl _⊗_ e ⊗-monoid [] = refl
+foldr-monoid-foldl _⊗_ e ⊗-monoid (x ∷ xs)
+  rewrite identityˡ ⊗-monoid x
+        | foldl-monoid _⊗_ e ⊗-monoid xs x
+  = cong (x ⊗_) (foldr-monoid-foldl _⊗_ e ⊗-monoid xs)
