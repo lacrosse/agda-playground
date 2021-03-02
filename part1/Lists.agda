@@ -138,15 +138,11 @@ rev-aux-++ xs (y ∷ ys)
         | ++-assoc (rev-aux [] ys) [ y ] (xs)
   = refl
 
-∷-++ : ∀ {A : Set} (h : A) (t : List A) → h ∷ t ≡ [ h ] ++ t
-∷-++ h xs = refl
-
 rev-++-distrib : ∀ {A : Set} (xs ys : List A) → rev (xs ++ ys) ≡ rev ys ++ rev xs
 rev-++-distrib [] ys = sym (++-identityʳ (rev ys))
 rev-++-distrib xs [] = cong rev (++-identityʳ xs)
 rev-++-distrib (x ∷ xs) (y ∷ ys)
-  rewrite ∷-++ x (xs ++ y ∷ ys)
-        | rev-aux-++ [ x ] (xs ++ y ∷ ys)
+  rewrite rev-aux-++ [ x ] (xs ++ y ∷ ys)
         | rev-++-distrib xs (y ∷ ys)
         | rev-aux-++ [ x ] xs
         | rev-aux-++ [ y ] ys
@@ -156,8 +152,7 @@ rev-++-distrib (x ∷ xs) (y ∷ ys)
 rev-involutive : ∀ {A : Set} (xs : List A) → rev (rev xs) ≡ xs
 rev-involutive [] = refl
 rev-involutive (x ∷ xs)
-  rewrite ∷-++ x xs
-        | rev-aux-++ [ x ] xs
+  rewrite rev-aux-++ [ x ] xs
         | rev-++-distrib xs [ x ]
         | rev-++-distrib (rev xs) [ x ]
         | rev-involutive xs
@@ -379,3 +374,27 @@ All-++-⇔ xs ys =
     from : ∀ {A : Set} {P : A → Set} (xs ys : List A) → (All P xs × All P ys) → All P (xs ++ ys)
     from [] _ ⟨ _ , Pys ⟩ = Pys
     from (x ∷ xs) ys ⟨ Px ∷ Pxs , Pys ⟩ = Px ∷ from xs ys ⟨ Pxs , Pys ⟩
+
+-- Exercise Any-++-⇔
+
+open import Data.Sum using (_⊎_)
+open _⊎_
+
+Any-++-⇔ : ∀ {A : Set} {P : A → Set} (xs ys : List A) → Any P (xs ++ ys) ⇔ (Any P xs ⊎ Any P ys)
+Any-++-⇔ xs ys =
+  record { to = to xs ys ; from = from xs ys }
+  where
+    to : ∀ {A : Set} {P : A → Set} (xs ys : List A) → Any P (xs ++ ys) → (Any P xs ⊎ Any P ys)
+    to [] _ P++ = inj₂ P++
+    to (_ ∷ _) _ (here Px) = inj₁ (here Px)
+    to (_ ∷ xs) ys (there P++) with to xs ys P++
+    ... | inj₁ Pxs = inj₁ (there Pxs)
+    ... | inj₂ Pys = inj₂ Pys
+    from : ∀ {A : Set} {P : A → Set} (xs ys : List A) → (Any P xs ⊎ Any P ys) → Any P (xs ++ ys)
+    from [] _ (inj₂ Pys) = Pys
+    from _  _ (inj₁ (here Px)) = here Px
+    from (_ ∷ xs) ys (inj₁ (there Pxs)) = there (from xs ys (inj₁ Pxs))
+    from (_ ∷ xs) ys (inj₂ Pys) = there (from xs ys (inj₂ Pys))
+
+∈-++ : ∀ {A : Set} {x : A} (xs ys : List A) → (x ∈ (xs ++ ys)) ⇔ (x ∈ xs ⊎ x ∈ ys)
+∈-++ = Any-++-⇔
