@@ -206,9 +206,9 @@ sum = foldr _+_ 0
 product : List ℕ → ℕ
 product = foldr _*_ 1
 
-foldr-++ : ∀ {A B : Set} {e : B} (f : A → B → B) (xs ys : List A) → foldr f e (xs ++ ys) ≡ foldr f (foldr f e ys) xs
-foldr-++ _ [] ys = refl
-foldr-++ f (x ∷ xs) ys = cong (f x) (foldr-++ f xs ys)
+foldr-++ : ∀ {A B : Set} (f : A → B → B) (e : B) (xs ys : List A) → foldr f e (xs ++ ys) ≡ foldr f (foldr f e ys) xs
+foldr-++ _ _ [] ys = refl
+foldr-++ f _ (x ∷ xs) ys = cong (f x) (foldr-++ f _ xs ys)
 
 foldr-∷ : ∀ {A : Set} (xs : List A) → foldr _∷_ [] xs ≡ xs
 foldr-∷ [] = refl
@@ -277,3 +277,37 @@ sum-downFrom (suc n)
         | m+n∸m≡n n (n + 0)
         | +-identityʳ n
   = refl
+
+-- Monoids
+
+record IsMonoid {A : Set} (_⊗_ : A → A → A) (e : A) : Set where
+  field
+    assoc     : ∀ (x y z : A) → (x ⊗ y) ⊗ z ≡ x ⊗ (y ⊗ z)
+    identityˡ : ∀ (x : A) → e ⊗ x ≡ x
+    identityʳ : ∀ (x : A) → x ⊗ e ≡ x
+
+open IsMonoid
+
++-monoid : IsMonoid _+_ 0
++-monoid = record { assoc = +-assoc ; identityˡ = +-identityˡ ; identityʳ = +-identityʳ }
+
+*-monoid : IsMonoid _*_ 1
+*-monoid = record { assoc = *-assoc ; identityˡ = *-identityˡ ; identityʳ = *-identityʳ }
+
+++-monoid : ∀ {A : Set} → IsMonoid {List A} _++_ []
+++-monoid = record { assoc = ++-assoc ; identityˡ = ++-identityˡ ; identityʳ = ++-identityʳ }
+
+foldr-monoid :
+  ∀ {A : Set} (_⊗_ : A → A → A) (e : A) → IsMonoid _⊗_ e
+  → ∀ (xs : List A) (y : A) → foldr _⊗_ y xs ≡ foldr _⊗_ e xs ⊗ y
+foldr-monoid _⊗_ e ⊗-monoid [] y = sym (identityˡ ⊗-monoid y)
+foldr-monoid _⊗_ e ⊗-monoid (x ∷ xs) y
+  rewrite assoc ⊗-monoid x (foldr _⊗_ e xs) y
+  = cong (x ⊗_) (foldr-monoid _⊗_ e ⊗-monoid xs y)
+
+foldr-monoid-++ :
+  ∀ {A : Set} (_⊗_ : A → A → A) (e : A) → IsMonoid _⊗_ e
+  → ∀ (xs ys : List A) → foldr _⊗_ e (xs ++ ys) ≡ foldr _⊗_ e xs ⊗ foldr _⊗_ e ys
+foldr-monoid-++ _⊗_ e ⊗-monoid xs ys
+  rewrite foldr-++ _⊗_ e xs ys
+  = foldr-monoid _⊗_ e ⊗-monoid xs (foldr _⊗_ e ys)
