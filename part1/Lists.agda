@@ -365,3 +365,17 @@ _ = here refl
 not-in : 1 ∉ first-ℕ 1
 not-in (here ())
 not-in (there ())
+
+-- All and append
+
+All-++-⇔ : ∀ {A : Set} {P : A → Set} (xs ys : List A) → All P (xs ++ ys) ⇔ (All P xs × All P ys)
+All-++-⇔ xs ys =
+  record { to = to xs ys ; from = from xs ys }
+  where
+    to : ∀ {A : Set} {P : A → Set} (xs ys : List A) → All P (xs ++ ys) → (All P xs × All P ys)
+    to [] _ Pys = ⟨ [] , Pys ⟩
+    to (_ ∷ xs) ys (Px ∷ P++) with to xs ys P++
+    ... | ⟨ Pxs , Pys ⟩ = ⟨ Px ∷ Pxs , Pys ⟩
+    from : ∀ {A : Set} {P : A → Set} (xs ys : List A) → (All P xs × All P ys) → All P (xs ++ ys)
+    from [] _ ⟨ _ , Pys ⟩ = Pys
+    from (x ∷ xs) ys ⟨ Px ∷ Pxs , Pys ⟩ = Px ∷ from xs ys ⟨ Pxs , Pys ⟩
