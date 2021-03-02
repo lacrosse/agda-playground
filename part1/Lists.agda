@@ -179,3 +179,7 @@ map-compose-list f g (x ∷ xs) rewrite map-compose-list f g xs = refl
 
 map-compose : ∀ {A B C : Set} {f : A → B} {g : B → C} → map (g ∘ f) ≡ map g ∘ map f
 map-compose = extensionality (map-compose-list _ _)
+
+map-++-distribute : ∀ {A B : Set} (f : A → B) → (xs ys : List A) → map f (xs ++ ys) ≡ map f xs ++ map f ys
+map-++-distribute _ [] _ = refl
+map-++-distribute f (x ∷ xs) ys rewrite map-++-distribute f xs ys = refl
