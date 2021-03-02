@@ -21,6 +21,23 @@ infixr 5 _∷_
 _ : List ℕ
 _ = 0 ∷ 1 ∷ 2 ∷ []
 
+{-# BUILTIN LIST List #-}
+
+pattern [_] z = z ∷ []
+pattern [_,_] y z = y ∷ z ∷ []
+pattern [_,_,_] x y z = x ∷ y ∷ z ∷ []
+pattern [_,_,_,_] w x y z = w ∷ x ∷ y ∷ z ∷ []
+pattern [_,_,_,_,_] v w x y z = v ∷ w ∷ x ∷ y ∷ z ∷ []
+pattern [_,_,_,_,_,_] u v w x y z = u ∷ v ∷ w ∷ x ∷ y ∷ z ∷ []
+
+infixr 5 _++_
+_++_ : ∀ {A : Set} → List A → List A → List A
+[]        ++ b = b
+(ah ∷ at) ++ b = ah ∷ (at ++ b)
+
+_ : [ 0 , 1 , 2 ] ++ [ 93 , 42 ] ≡ [ 0 , 1 , 2 , 93 , 42 ]
+_ = refl
+
 -- OK I can't stop myself now
 
 first-ℕ : ℕ → List ℕ
@@ -36,12 +53,14 @@ first-5 = first-ℕ 5
 _ : first-5 ≡ 0 ∷ 1 ∷ 2 ∷ 3 ∷ 4 ∷ []
 _ = refl
 
+rev-aux : ∀ {A : Set} → List A → List A → List A
+rev-aux acc []      = acc
+rev-aux acc (h ∷ t) = rev-aux (h ∷ acc) t
+
 rev : ∀ {A : Set} → List A → List A
-rev {A} = aux []
-  where
-    aux : List A → List A → List A
-    aux acc []      = acc
-    aux acc (h ∷ t) = aux (h ∷ acc) t
+rev {A} = rev-aux {A} []
+
+-- Just wow.
 
 rev-first-5 : List ℕ
 rev-first-5 = rev first-5
@@ -82,23 +101,6 @@ _ = refl
 
 -- End rant, resume PFLA
 
-{-# BUILTIN LIST List #-}
-
-pattern [_] z = z ∷ []
-pattern [_,_] y z = y ∷ z ∷ []
-pattern [_,_,_] x y z = x ∷ y ∷ z ∷ []
-pattern [_,_,_,_] w x y z = w ∷ x ∷ y ∷ z ∷ []
-pattern [_,_,_,_,_] v w x y z = v ∷ w ∷ x ∷ y ∷ z ∷ []
-pattern [_,_,_,_,_,_] u v w x y z = u ∷ v ∷ w ∷ x ∷ y ∷ z ∷ []
-
-infixr 5 _++_
-_++_ : ∀ {A : Set} → List A → List A → List A
-[]        ++ b = b
-(ah ∷ at) ++ b = ah ∷ (at ++ b)
-
-_ : [ 0 , 1 , 2 ] ++ [ 93 , 42 ] ≡ [ 0 , 1 , 2 , 93 , 42 ]
-_ = refl
-
 ++-assoc : ∀ {A : Set} (xs ys zs : List A) → (xs ++ ys) ++ zs ≡ xs ++ (ys ++ zs)
 ++-assoc []       ys zs = refl
 ++-assoc (x ∷ xs) ys zs = cong (x ∷_) (++-assoc xs ys zs)
@@ -122,3 +124,31 @@ _ = refl
 length-distrib-++-+ : ∀ {A : Set} (xs ys : List A) → length (xs ++ ys) ≡ length xs + length ys
 length-distrib-++-+ []       ys = refl
 length-distrib-++-+ (x ∷ xs) ys = cong suc (length-distrib-++-+ xs ys)
+
+-- Reverse done already.
+
+-- Exercises
+
+rev-aux-++ : ∀ {A : Set} (xs ys : List A) → rev-aux xs ys ≡ rev ys ++ xs
+rev-aux-++ [] [] = refl
+rev-aux-++ (x ∷ xs) [] = refl
+rev-aux-++ xs (y ∷ ys)
+  rewrite rev-aux-++ (y ∷ xs) ys
+        | rev-aux-++ [ y ] ys
+        | ++-assoc (rev-aux [] ys) [ y ] (xs)
+  = refl
+
+∷-++ : ∀ {A : Set} (h : A) (t : List A) → h ∷ t ≡ [ h ] ++ t
+∷-++ h xs = refl
+
+rev-++-distrib : ∀ {A : Set} (xs ys : List A) → rev (xs ++ ys) ≡ rev ys ++ rev xs
+rev-++-distrib [] ys = sym (++-identityʳ (rev ys))
+rev-++-distrib xs [] = cong rev (++-identityʳ xs)
+rev-++-distrib (x ∷ xs) (y ∷ ys)
+  rewrite ∷-++ x (xs ++ y ∷ ys)
+        | rev-aux-++ [ x ] (xs ++ y ∷ ys)
+        | rev-++-distrib xs (y ∷ ys)
+        | rev-aux-++ [ x ] xs
+        | rev-aux-++ [ y ] ys
+        | ++-assoc (rev ys ++ [ y ]) (rev xs) [ x ]
+  = refl
