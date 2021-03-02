@@ -54,7 +54,7 @@ map {A} {B} f []      = []
 map {A} {B} f (h ∷ t) = f h ∷ map f t
 
 rev+1 : List ℕ
-rev+1 = map (_+_ 1) rev-first-5
+rev+1 = map (_+ 1) rev-first-5
 
 _ : rev+1 ≡ 5 ∷ 4 ∷ 3 ∷ 2 ∷ 1 ∷ []
 _ = refl
@@ -67,7 +67,7 @@ first-4-pairs =
   |> map (λ x →
     2
     |> first-ℕ
-    |> map (_+_ x)
+    |> map (_+ x)
   )
   |> rev
   |> map rev
@@ -90,3 +90,22 @@ pattern [_,_,_] x y z = x ∷ y ∷ z ∷ []
 pattern [_,_,_,_] w x y z = w ∷ x ∷ y ∷ z ∷ []
 pattern [_,_,_,_,_] v w x y z = v ∷ w ∷ x ∷ y ∷ z ∷ []
 pattern [_,_,_,_,_,_] u v w x y z = u ∷ v ∷ w ∷ x ∷ y ∷ z ∷ []
+
+infixr 5 _++_
+_++_ : ∀ {A : Set} → List A → List A → List A
+[]        ++ b = b
+(ah ∷ at) ++ b = ah ∷ (at ++ b)
+
+_ : [ 0 , 1 , 2 ] ++ [ 93 , 42 ] ≡ [ 0 , 1 , 2 , 93 , 42 ]
+_ = refl
+
+++-assoc : ∀ {A : Set} (xs ys zs : List A) → (xs ++ ys) ++ zs ≡ xs ++ (ys ++ zs)
+++-assoc []       ys zs = refl
+++-assoc (x ∷ xs) ys zs = cong (x ∷_) (++-assoc xs ys zs)
+
+++-identityˡ : ∀ {A : Set} (xs : List A) → [] ++ xs ≡ xs
+++-identityˡ xs = refl
+
+++-identityʳ : ∀ {A : Set} (xs : List A) → xs ++ [] ≡ xs
+++-identityʳ []       = refl
+++-identityʳ (x ∷ xs) = cong (x ∷_) (++-identityʳ xs)
