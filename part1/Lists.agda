@@ -109,3 +109,16 @@ _ = refl
 ++-identityʳ : ∀ {A : Set} (xs : List A) → xs ++ [] ≡ xs
 ++-identityʳ []       = refl
 ++-identityʳ (x ∷ xs) = cong (x ∷_) (++-identityʳ xs)
+
+-- Length
+
+length : ∀ {A : Set} (list : List A) → ℕ
+length []         = 0
+length (_ ∷ list) = 1 + length list
+
+_ : length first-4-pairs ≡ 4
+_ = refl
+
+length-distrib-++-+ : ∀ {A : Set} (xs ys : List A) → length (xs ++ ys) ≡ length xs + length ys
+length-distrib-++-+ []       ys = refl
+length-distrib-++-+ (x ∷ xs) ys = cong suc (length-distrib-++-+ xs ys)
