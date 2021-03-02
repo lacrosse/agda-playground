@@ -371,6 +371,7 @@ All-++-⇔ xs ys =
     to [] _ Pys = ⟨ [] , Pys ⟩
     to (_ ∷ xs) ys (Px ∷ P++) with to xs ys P++
     ... | ⟨ Pxs , Pys ⟩ = ⟨ Px ∷ Pxs , Pys ⟩
+
     from : ∀ {A : Set} {P : A → Set} (xs ys : List A) → (All P xs × All P ys) → All P (xs ++ ys)
     from [] _ ⟨ _ , Pys ⟩ = Pys
     from (x ∷ xs) ys ⟨ Px ∷ Pxs , Pys ⟩ = Px ∷ from xs ys ⟨ Pxs , Pys ⟩
@@ -398,3 +399,31 @@ Any-++-⇔ xs ys =
 
 ∈-++ : ∀ {A : Set} {x : A} (xs ys : List A) → (x ∈ (xs ++ ys)) ⇔ (x ∈ xs ⊎ x ∈ ys)
 ∈-++ = Any-++-⇔
+
+-- Exercise All-++-≃
+
+All-++-≃ : ∀ {A : Set} {P : A → Set} (xs ys : List A) → All P (xs ++ ys) ≃ (All P xs × All P ys)
+All-++-≃ {A} {P} xs ys =
+  record
+    { to = to′ xs ys
+    ; from = from′ xs ys
+    ; from∘to = ft-identity xs ys
+    ; to∘from = tf-identity xs ys
+    }
+      where
+        to′ : ∀ (xs ys : List A) → All P (xs ++ ys) → (All P xs × All P ys)
+        to′ [] _ Pys = ⟨ [] , Pys ⟩
+        to′ (_ ∷ xs) ys (Px ∷ P++) with to′ xs ys P++
+        ... | ⟨ Pxs , Pys ⟩ = ⟨ Px ∷ Pxs , Pys ⟩
+
+        from′ : ∀ (xs ys : List A) → (All P xs × All P ys) → All P (xs ++ ys)
+        from′ [] _ ⟨ _ , Pys ⟩ = Pys
+        from′ (_ ∷ xs) ys ⟨ Px ∷ Pxs , Pys ⟩ = Px ∷ from′ xs ys ⟨ Pxs , Pys ⟩
+
+        ft-identity : ∀ (xs ys : List A) (p++ : All P (xs ++ ys)) → from′ xs ys (to′ xs ys p++) ≡ p++
+        ft-identity [] _ _ = refl
+        ft-identity (_ ∷ xs) ys (Px ∷ P++) = cong (Px ∷_) (ft-identity xs ys P++)
+
+        tf-identity : ∀ (xs ys : List A) (p× : All P xs × All P ys) → to′ xs ys (from′ xs ys p×) ≡ p×
+        tf-identity [] _ ⟨ [] , _ ⟩ = refl
+        tf-identity (x ∷ xs) ys ⟨ Px ∷ Pxs , Pys ⟩ rewrite tf-identity xs ys ⟨ Pxs , Pys ⟩ = refl
