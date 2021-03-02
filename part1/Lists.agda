@@ -191,3 +191,36 @@ data Tree (A B : Set) : Set where
 map-Tree : ∀ {A B C D : Set} → (A → C) → (B → D) → Tree A B → Tree C D
 map-Tree a→c _   (leaf a)            = leaf (a→c a)
 map-Tree a→c b→d (node left b right) = node (map-Tree a→c b→d left) (b→d b) (map-Tree a→c b→d right)
+
+-- Fold
+
+foldr : ∀ {A B : Set} → (A → B → B) → B → List A → B
+foldr _ acc []       = acc
+foldr f acc (x ∷ xs) = f x (foldr f acc xs)
+
+sum : List ℕ → ℕ
+sum = foldr _+_ 0
+
+-- Exercises
+
+product : List ℕ → ℕ
+product = foldr _*_ 1
+
+foldr-++ : ∀ {A B : Set} {e : B} (f : A → B → B) (xs ys : List A) → foldr f e (xs ++ ys) ≡ foldr f (foldr f e ys) xs
+foldr-++ _ [] ys = refl
+foldr-++ f (x ∷ xs) ys = cong (f x) (foldr-++ f xs ys)
+
+foldr-∷ : ∀ {A : Set} (xs : List A) → foldr _∷_ [] xs ≡ xs
+foldr-∷ [] = refl
+foldr-∷ (x ∷ xs) = cong (x ∷_) (foldr-∷ xs)
+
+++-foldr-∷ : ∀ {A : Set} (xs ys : List A) → xs ++ ys ≡ foldr _∷_ ys xs
+++-foldr-∷ [] _ = refl
+++-foldr-∷ (x ∷ xs) ys = cong (x ∷_) (++-foldr-∷ xs ys)
+
+map-is-foldr-list : ∀ {A B : Set} (f : A → B) (ys : List A) → map f ys ≡ foldr (λ x xs → f x ∷ xs) [] ys
+map-is-foldr-list _ [] = refl
+map-is-foldr-list f (x ∷ xs) rewrite map-is-foldr-list f xs = cong (f x ∷_) refl
+
+map-is-foldr : ∀ {A B : Set} (f : A → B) → map f ≡ foldr (λ x xs → f x ∷ xs) []
+map-is-foldr = extensionality ∘ map-is-foldr-list
