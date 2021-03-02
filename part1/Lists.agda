@@ -224,3 +224,20 @@ map-is-foldr-list f (x ∷ xs) rewrite map-is-foldr-list f xs = cong (f x ∷_) 
 
 map-is-foldr : ∀ {A B : Set} (f : A → B) → map f ≡ foldr (λ x xs → f x ∷ xs) []
 map-is-foldr = extensionality ∘ map-is-foldr-list
+
+fold-Tree : ∀ {A B C : Set} → (A → C) → (C → B → C → C) → Tree A B → C
+fold-Tree fl _ (leaf a) = fl a
+fold-Tree fl f (node left b right) = f (fold-Tree fl f left) b (fold-Tree fl f right)
+
+_ : fold-Tree (λ x → x) (λ left center right → left + center + right) (node (node (leaf 0) 93 (leaf 3)) 1 (leaf 931)) ≡ 1028
+_ = refl
+
+map-is-fold-Tree-tree : ∀ {A B C D : Set} (fl : A → C) (fn : B → D) (tree : Tree A B) → map-Tree fl fn tree ≡ fold-Tree (λ a → leaf (fl a)) (λ left b right → node left (fn b) right) tree
+map-is-fold-Tree-tree _ _ (leaf a) = refl
+map-is-fold-Tree-tree fl fn (node left b right)
+  rewrite map-is-fold-Tree-tree fl fn left
+        | map-is-fold-Tree-tree fl fn right
+  = refl
+
+map-is-fold-Tree : ∀ {A B C D : Set} {fl : A → C} {fn : B → D} → map-Tree fl fn ≡ fold-Tree (λ a → leaf (fl a)) (λ left b right → node left (fn b) right)
+map-is-fold-Tree = extensionality (map-is-fold-Tree-tree _ _)
