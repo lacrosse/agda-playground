@@ -162,3 +162,20 @@ rev-involutive (x ∷ xs)
         | rev-++-distrib (rev xs) [ x ]
         | rev-involutive xs
   = refl
+
+-- Faster reverse
+-- Done already.
+
+-- Map
+-- Done already.
+
+-- Exercise
+
+open part1.Isomorphism using (extensionality)
+
+map-compose-list : ∀ {A B C : Set} (f : A → B) (g : B → C) (xs : List A) → map (g ∘ f) xs ≡ (map g ∘ map f) xs
+map-compose-list _ _ [] = refl
+map-compose-list f g (x ∷ xs) rewrite map-compose-list f g xs = refl
+
+map-compose : ∀ {A B C : Set} {f : A → B} {g : B → C} → map (g ∘ f) ≡ map g ∘ map f
+map-compose = extensionality (map-compose-list _ _)
