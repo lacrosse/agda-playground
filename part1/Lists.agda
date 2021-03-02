@@ -152,3 +152,13 @@ rev-++-distrib (x ∷ xs) (y ∷ ys)
         | rev-aux-++ [ y ] ys
         | ++-assoc (rev ys ++ [ y ]) (rev xs) [ x ]
   = refl
+
+rev-involutive : ∀ {A : Set} (xs : List A) → rev (rev xs) ≡ xs
+rev-involutive [] = refl
+rev-involutive (x ∷ xs)
+  rewrite ∷-++ x xs
+        | rev-aux-++ [ x ] xs
+        | rev-++-distrib xs [ x ]
+        | rev-++-distrib (rev xs) [ x ]
+        | rev-involutive xs
+  = refl
