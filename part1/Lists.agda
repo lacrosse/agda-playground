@@ -427,3 +427,19 @@ All-++-≃ {A} {P} xs ys =
         tf-identity : ∀ (xs ys : List A) (p× : All P xs × All P ys) → to′ xs ys (from′ xs ys p×) ≡ p×
         tf-identity [] _ ⟨ [] , _ ⟩ = refl
         tf-identity (x ∷ xs) ys ⟨ Px ∷ Pxs , Pys ⟩ rewrite tf-identity xs ys ⟨ Pxs , Pys ⟩ = refl
+
+-- Exercise ¬Any⇔All¬
+
+¬Any⇔All¬ : ∀ {A : Set} {P : A → Set} (xs : List A) → (¬_ ∘ Any P) xs ⇔ All (¬_ ∘ P) xs
+¬Any⇔All¬ xs =
+  record
+    { to = to′ xs
+    ; from = from′ xs
+    }
+    where
+      to′ : ∀ {A : Set} {P : A → Set} (xs : List A) → (¬_ ∘ Any P) xs → All (¬_ ∘ P) xs
+      to′ [] ¬Any = []
+      to′ (_ ∷ xs) ¬Any = (¬Any ∘ here) ∷ to′ xs (¬Any ∘ there)
+      from′ : ∀ {A : Set} {P : A → Set} (xs : List A) → All (¬_ ∘ P) xs → (¬_ ∘ Any P) xs
+      from′ _ (¬P ∷ _) (here Px) = ¬P Px
+      from′ (_ ∷ xs) (_ ∷ All¬) (there Anyxs) = from′ xs All¬ Anyxs
