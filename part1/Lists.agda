@@ -433,7 +433,7 @@ All-++-≃ {A} {P} xs ys =
 open import Data.Empty using (⊥; ⊥-elim)
 
 ¬Any⇔All¬ : ∀ {A : Set} {P : A → Set} (xs : List A) → (¬_ ∘ Any P) xs ≃ All (¬_ ∘ P) xs
-¬Any⇔All¬ xs =
+¬Any⇔All¬ {A} {P} xs =
   record
     { to = to′ xs
     ; from = from′ xs
@@ -441,14 +441,14 @@ open import Data.Empty using (⊥; ⊥-elim)
     ; to∘from = tf-identity
     }
     where
-      to′ : ∀ {A : Set} {P : A → Set} (xs : List A) → (¬_ ∘ Any P) xs → All (¬_ ∘ P) xs
+      to′ : ∀ (xs : List A) → (¬_ ∘ Any P) xs → All (¬_ ∘ P) xs
       to′ [] ¬Any = []
       to′ (_ ∷ xs) ¬Any = (¬Any ∘ here) ∷ to′ xs (¬Any ∘ there)
-      from′ : ∀ {A : Set} {P : A → Set} (xs : List A) → All (¬_ ∘ P) xs → (¬_ ∘ Any P) xs
+      from′ : ∀ (xs : List A) → All (¬_ ∘ P) xs → (¬_ ∘ Any P) xs
       from′ _ (¬P ∷ _) (here Px) = ¬P Px
       from′ (_ ∷ xs) (_ ∷ All¬) (there Anyxs) = from′ xs All¬ Anyxs
-      ft-identity : ∀ {A : Set} {P : A → Set} {xs : List A} (x : (¬_ ∘ Any P) xs) → from′ xs (to′ xs x) ≡ x
+      ft-identity : ∀ {xs : List A} (x : (¬_ ∘ Any P) xs) → from′ xs (to′ xs x) ≡ x
       ft-identity ¬Any = extensionality (⊥-elim ∘ ¬Any)
-      tf-identity : ∀ {A : Set} {P : A → Set} {xs : List A} (x : All (¬_ ∘ P) xs) → to′ xs (from′ xs x) ≡ x
+      tf-identity : ∀ {xs : List A} (x : All (¬_ ∘ P) xs) → to′ xs (from′ xs x) ≡ x
       tf-identity [] = refl
       tf-identity (¬Px ∷ All¬) = cong (¬Px ∷_) (tf-identity All¬)
