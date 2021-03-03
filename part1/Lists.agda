@@ -428,13 +428,17 @@ All-++-≃ {A} {P} xs ys =
         tf-identity [] _ ⟨ [] , _ ⟩ = refl
         tf-identity (x ∷ xs) ys ⟨ Px ∷ Pxs , Pys ⟩ rewrite tf-identity xs ys ⟨ Pxs , Pys ⟩ = refl
 
--- Exercise ¬Any⇔All¬
+-- Exercise ¬Any≃All¬
 
-¬Any⇔All¬ : ∀ {A : Set} {P : A → Set} (xs : List A) → (¬_ ∘ Any P) xs ⇔ All (¬_ ∘ P) xs
+open import Data.Empty using (⊥; ⊥-elim)
+
+¬Any⇔All¬ : ∀ {A : Set} {P : A → Set} (xs : List A) → (¬_ ∘ Any P) xs ≃ All (¬_ ∘ P) xs
 ¬Any⇔All¬ xs =
   record
     { to = to′ xs
     ; from = from′ xs
+    ; from∘to = ft-identity
+    ; to∘from = tf-identity
     }
     where
       to′ : ∀ {A : Set} {P : A → Set} (xs : List A) → (¬_ ∘ Any P) xs → All (¬_ ∘ P) xs
@@ -443,3 +447,8 @@ All-++-≃ {A} {P} xs ys =
       from′ : ∀ {A : Set} {P : A → Set} (xs : List A) → All (¬_ ∘ P) xs → (¬_ ∘ Any P) xs
       from′ _ (¬P ∷ _) (here Px) = ¬P Px
       from′ (_ ∷ xs) (_ ∷ All¬) (there Anyxs) = from′ xs All¬ Anyxs
+      ft-identity : ∀ {A : Set} {P : A → Set} {xs : List A} (x : (¬_ ∘ Any P) xs) → from′ xs (to′ xs x) ≡ x
+      ft-identity ¬Any = extensionality (⊥-elim ∘ ¬Any)
+      tf-identity : ∀ {A : Set} {P : A → Set} {xs : List A} (x : All (¬_ ∘ P) xs) → to′ xs (from′ xs x) ≡ x
+      tf-identity [] = refl
+      tf-identity (¬Px ∷ All¬) = cong (¬Px ∷_) (tf-identity All¬)
