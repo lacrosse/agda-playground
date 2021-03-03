@@ -452,3 +452,26 @@ open import Data.Empty using (⊥; ⊥-elim)
       tf-identity : ∀ {xs : List A} (x : All (¬_ ∘ P) xs) → to′ xs (from′ xs x) ≡ x
       tf-identity [] = refl
       tf-identity (¬Px ∷ All¬) = cong (¬Px ∷_) (tf-identity All¬)
+
+-- All-∀
+
+-- All-∀ : ∀ {A : Set} {P : A → Set} (xs : List A) → (All P xs) ≃ (∀ {x : A} → x ∈ xs → P x)
+-- All-∀ {A} {P} xs =
+--   record
+--     { to = to′ xs
+--     ; from = from′ xs
+--     ; from∘to = ft-identity xs
+--     ; to∘from = {!   !}
+--     }
+--     where
+--       to′ : ∀ {A : Set} {P : A → Set} (xs : List A) → All P xs → (∀ {x : A} → x ∈ xs → P x)
+--       to′ _ (x ∷ _) (here refl) = x
+--       to′ (_ ∷ xs) (_ ∷ Pxs) (there x∈xs) = to′ xs Pxs x∈xs
+--       from′ : ∀ {A : Set} {P : A → Set} (xs : List A) → (∀ {x : A} → x ∈ xs → P x) → (All P xs)
+--       from′ [] ∀∈ = []
+--       from′ (_ ∷ xs) ∀∈ = ∀∈ (here refl) ∷ from′ xs (∀∈ ∘ there)
+--       ft-identity : ∀ {A : Set} {P : A → Set} (xs : List A) (x : All P xs) → from′ xs (to′ xs x) ≡ x
+--       ft-identity _ [] = refl
+--       ft-identity (_ ∷ xs) (Px ∷ Pxs) = cong (Px ∷_) (ft-identity xs Pxs)
+--       tf-identity : ∀ {A : Set} {P : A → Set} (xs : List A) (y : {x : A} → x ∈ xs → P x) → to′ xs (from′ xs y) ≡ y
+--       tf-identity = {!   !}
