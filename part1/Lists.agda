@@ -502,3 +502,18 @@ Any-∃ {A} {P} xs =
     tf-identity : ∀ (xs : List A) → (a : ∃[ x ] (x ∈ xs × P x)) → to′ xs (from′ xs a) ≡ a
     tf-identity _ ⟨ _ , ⟨ here refl , _ ⟩ ⟩ = refl
     tf-identity (y ∷ ys) ⟨ g , ⟨ there g∈ys , Pg ⟩ ⟩ = cong (λ{⟨ h , ⟨ h∈ys , Ph ⟩ ⟩ → ⟨ h , ⟨ there h∈ys , Ph ⟩ ⟩}) (tf-identity ys ⟨ g , ⟨ g∈ys , Pg ⟩ ⟩)
+
+-- Decidability of All
+
+all : ∀ {A : Set} → (A → Bool) → List A → Bool
+all p = foldr _∧_ true ∘ map p
+
+Decidable : ∀ {A : Set} → (A → Set) → Set
+Decidable {A} p = ∀ (x : A) → Dec (p x)
+
+All? : ∀ {A : Set} {P : A → Set} → Decidable P → Decidable (All P)
+All? P? [] = yes []
+All? P? (x ∷ xs) with P? x | All? P? xs
+... | yes Px | yes Pxs = yes (Px ∷ Pxs)
+... | no ¬Px | _       = no λ{(Px ∷ _)  → ¬Px Px}
+... | _      | no ¬Pxs = no λ{(_ ∷ Pxs) → ¬Pxs Pxs}
