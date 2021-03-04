@@ -517,3 +517,17 @@ All? P? (x ∷ xs) with P? x | All? P? xs
 ... | yes Px | yes Pxs = yes (Px ∷ Pxs)
 ... | no ¬Px | _       = no λ{(Px ∷ _)  → ¬Px Px}
 ... | _      | no ¬Pxs = no λ{(_ ∷ Pxs) → ¬Pxs Pxs}
+
+-- Exercise: Decidability of Any
+
+any : ∀ {A : Set} → (A → Bool) → List A → Bool
+any p = foldr _∨_ false ∘ map p
+
+open Relation.Nullary using (Reflects; _because_)
+
+Any? : ∀ {A : Set} {P : A → Set} → Decidable P → Decidable (Any P)
+Any? P? [] = no λ()
+Any? P? (x ∷ xs) with P? x | Any? P? xs
+... | yes Px | _ = yes (here Px)
+... | no ¬Px | yes Pxs = yes (there Pxs)
+... | no ¬Px | no ¬Pxs = no λ{(here Px) → ¬Px Px ; (there Pxs) → ¬Pxs Pxs}
