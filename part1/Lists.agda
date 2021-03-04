@@ -531,3 +531,19 @@ Any? P? (x ∷ xs) with P? x | Any? P? xs
 ... | yes Px | _ = yes (here Px)
 ... | no ¬Px | yes Pxs = yes (there Pxs)
 ... | no ¬Px | no ¬Pxs = no λ{(here Px) → ¬Px Px ; (there Pxs) → ¬Pxs Pxs}
+
+-- Exercise split
+
+data merge {A : Set} : (xs ys zs : List A) → Set where
+  [] : merge [] [] []
+  left-∷ : ∀ {x xs ys zs} → merge xs ys zs → merge (x ∷ xs) ys (x ∷ zs)
+  right-∷ : ∀ {y xs ys zs} → merge xs ys zs → merge xs (y ∷ ys) (y ∷ zs)
+
+_ : merge [ 1 , 4 ] [ 2 , 3 ] [ 1 , 2 , 3 , 4 ]
+_ = left-∷ (right-∷ (right-∷ (left-∷ [])))
+
+split : ∀ {A : Set} {P : A → Set} (P? : Decidable P) (zs : List A) → ∃[ xs ] ∃[ ys ] (merge xs ys zs × All P xs × All (¬_ ∘ P) ys)
+split P? [] = ⟨ [] , ⟨ [] , ⟨ [] , ⟨ [] , [] ⟩ ⟩ ⟩ ⟩
+split P? (z ∷ zs) with P? z | split P? zs
+... | yes Pz | ⟨ xs , ⟨ ys , ⟨ merge′ , ⟨ Pxs , ¬Pys ⟩ ⟩ ⟩ ⟩ = ⟨ z ∷ xs , ⟨ ys , ⟨ left-∷ merge′ , ⟨ Pz ∷ Pxs , ¬Pys ⟩ ⟩ ⟩ ⟩
+... | no ¬Pz | ⟨ xs , ⟨ ys , ⟨ merge′ , ⟨ Pxs , ¬Pys ⟩ ⟩ ⟩ ⟩ = ⟨ xs , ⟨ z ∷ ys , ⟨ right-∷ merge′ , ⟨ Pxs , ¬Pz ∷ ¬Pys ⟩ ⟩ ⟩ ⟩

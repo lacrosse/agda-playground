@@ -13,6 +13,6 @@ I'm progressing through PLFA and writing these proofs.
   * [x] Negation
   * [x] Quantifiers
   * [x] Decidable
-  * [ ] Lists
+  * [x] Lists
 * [ ] Part 2
 * [ ] Part 3
