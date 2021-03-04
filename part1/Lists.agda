@@ -475,3 +475,30 @@ open import Data.Empty using (⊥; ⊥-elim)
 --       ft-identity (_ ∷ xs) (Px ∷ Pxs) = cong (Px ∷_) (ft-identity xs Pxs)
 --       tf-identity : ∀ {A : Set} {P : A → Set} (xs : List A) (y : {x : A} → x ∈ xs → P x) → to′ xs (from′ xs y) ≡ y
 --       tf-identity = {!   !}
+
+-- Any-∃
+
+open Data.Product using (proj₁; proj₂)
+
+Any-∃ : ∀ {A : Set} {P : A → Set} (xs : List A) → Any P xs ≃ ∃[ x ] (x ∈ xs × P x)
+Any-∃ {A} {P} xs =
+  record
+    { to = to′ xs
+    ; from = from′ xs
+    ; from∘to = ft-identity xs
+    ; to∘from = tf-identity xs
+    }
+  where
+    to′ : ∀ (xs : List A) → Any P xs → ∃[ x ] (x ∈ xs × P x)
+    to′ (x ∷ _)  (here Px) = ⟨ x , ⟨ here refl , Px ⟩ ⟩
+    to′ (_ ∷ ys) (there Anyxs) with to′ ys Anyxs
+    ... | ⟨ y , ⟨ ≡y , Py ⟩ ⟩ = ⟨ y , ⟨ there ≡y , Py ⟩ ⟩
+    from′ : ∀ (xs : List A) → ∃[ x ] (x ∈ xs × P x) → Any P xs
+    from′ _ ⟨ _ , ⟨ here refl , Px ⟩ ⟩ = here Px
+    from′ (_ ∷ ys) ⟨ g , ⟨ there Anyg≡ys , Pg ⟩ ⟩ = there (from′ ys ⟨ g , ⟨ Anyg≡ys , Pg ⟩ ⟩)
+    ft-identity : ∀ (xs : List A) (a : Any P xs) → from′ xs (to′ xs a) ≡ a
+    ft-identity (x ∷ _) (here Px) = refl
+    ft-identity (_ ∷ ys) (there Anyys) = cong there (ft-identity ys Anyys)
+    tf-identity : ∀ (xs : List A) → (a : ∃[ x ] (x ∈ xs × P x)) → to′ xs (from′ xs a) ≡ a
+    tf-identity _ ⟨ _ , ⟨ here refl , _ ⟩ ⟩ = refl
+    tf-identity (y ∷ ys) ⟨ g , ⟨ there g∈ys , Pg ⟩ ⟩ = cong (λ{⟨ h , ⟨ h∈ys , Ph ⟩ ⟩ → ⟨ h , ⟨ there h∈ys , Ph ⟩ ⟩}) (tf-identity ys ⟨ g , ⟨ g∈ys , Pg ⟩ ⟩)
