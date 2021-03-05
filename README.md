@@ -15,4 +15,5 @@ I'm progressing through PLFA and writing these proofs.
   * [x] Decidable
   * [x] Lists
 * [ ] Part 2
+  * [ ] Lambda
 * [ ] Part 3
