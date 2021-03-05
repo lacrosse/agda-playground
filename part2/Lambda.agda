@@ -68,3 +68,18 @@ sucᶜ : Term
 sucᶜ =
   ƛ "n" ⇒
   `suc (` "n")
+
+-- Exercise mul
+
+mul : Term
+mul =
+  μ "*" ⇒ ƛ "m" ⇒ ƛ "n" ⇒
+  case ` "m"
+    [zero⇒ `zero
+    |suc "m" ⇒ plus · ` "n" · (` "*" · ` "m" · ` "n")
+    ]
+
+mulᶜ : Term
+mulᶜ =
+  ƛ "m" ⇒ ƛ "n" ⇒ ƛ "s" ⇒ ƛ "z" ⇒
+  ` "m" · (ƛ "acc" ⇒ plusᶜ · ` "n" · ` "acc" · sucᶜ · ` "z") · ` "z"
