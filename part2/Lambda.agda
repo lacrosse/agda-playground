@@ -42,3 +42,29 @@ data Term : Set where
   `suc_ : Term → Term
   case_[zero⇒_|suc_⇒_] : Term → Term → Id → Term → Term
   μ_⇒_ : Id → Term → Term
+
+two : Term
+two = `suc `suc `zero
+
+plus : Term
+plus =
+  μ "+" ⇒ ƛ "m" ⇒ ƛ "n" ⇒
+  case ` "m"
+    [zero⇒ ` "n"
+    |suc "m" ⇒ `suc (` "+" · ` "m" · ` "n")
+    ]
+
+twoᶜ :  Term
+twoᶜ =
+  ƛ "s" ⇒ ƛ "z" ⇒
+  ` "s" · (` "s" · ` "z")
+
+plusᶜ : Term
+plusᶜ =
+  ƛ "m" ⇒ ƛ "n" ⇒ ƛ "s" ⇒ ƛ "z" ⇒
+  ` "m" · ` "s" · (` "n" · ` "s" · ` "z")
+
+sucᶜ : Term
+sucᶜ =
+  ƛ "n" ⇒
+  `suc (` "n")
