@@ -190,3 +190,17 @@ _[_:=_]′ (ƛ x ⇒ N) = subst-preserve ƛ_⇒_ x N
 _[_:=_]′ (μ_⇒_ x N) = subst-preserve μ_⇒_ x N
 _[_:=_]′ (case L [zero⇒ M |suc x ⇒ N ]) y V
   = subst-preserve (case L [ y := V ]′ [zero⇒ M [ y := V ]′ |suc_⇒_]) x N y V
+
+-- Reduction
+
+infix 4 _—→_
+
+data _—→_ : Term → Term → Set where
+  ξ-·₁ : ∀ {L L′ M} → L —→ L′ → L · M —→ L′ · M
+  ξ-·₂ : ∀ {V M M′} → Value V → M —→ M′ → V · M —→ V · M′
+  β-ƛ : ∀ {x N V} → Value V → (ƛ x ⇒ N) · V —→ N [ x := V ]
+  ξ-suc : ∀ {M M′} → M —→ M′ → `suc M —→ `suc M′
+  ξ-case : ∀ {x L L′ M N} → L —→ L′ → case L [zero⇒ M |suc x ⇒ N ] —→ case L′ [zero⇒ M |suc x ⇒ N ]
+  β-zero : ∀ {x M N} → case `zero [zero⇒ M |suc x ⇒ N ] —→ M
+  β-suc : ∀ {x V M N} → Value V → case `suc V [zero⇒ M |suc x ⇒ N ] —→ N [ x := V ]
+  β-μ : ∀ {x M} → μ x ⇒ M —→ M [ x := μ x ⇒ M ]
