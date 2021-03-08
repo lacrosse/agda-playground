@@ -204,3 +204,25 @@ data _—→_ : Term → Term → Set where
   β-zero : ∀ {x M N} → case `zero [zero⇒ M |suc x ⇒ N ] —→ M
   β-suc : ∀ {x V M N} → Value V → case `suc V [zero⇒ M |suc x ⇒ N ] —→ N [ x := V ]
   β-μ : ∀ {x M} → μ x ⇒ M —→ M [ x := μ x ⇒ M ]
+
+-- Quiz
+-- Answers: 1, 2, 2
+
+-- Reflexive and transitive closure
+
+infix 2 _—↠_
+infix 1 begin_
+infixr 2 _—↠⟨_⟩_
+infix 3 _∎
+
+data _—↠_ : Term → Term → Set where
+  _∎ : ∀ M → M —↠ M
+  _—↠⟨_⟩_ : ∀ L {M N} → L —→ M → M —↠ N → L —↠ N
+
+begin_ : ∀ {M N} → M —↠ N → M —↠ N
+begin_ M—↠N = M—↠N
+
+data _—↠′_ : Term → Term → Set where
+  step′ : ∀ {M N} → M —→ N → M —↠′ N
+  refl′ : ∀ {M} → M —↠′ M
+  trans′ : ∀ {L M N} → L —↠′ M → M —↠′ N → L —↠′ N
