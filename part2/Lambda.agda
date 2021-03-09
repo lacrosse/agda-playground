@@ -212,12 +212,12 @@ data _—→_ : Term → Term → Set where
 
 infix 2 _—↠_
 infix 1 begin_
-infixr 2 _—↠⟨_⟩_
+infixr 2 _—→⟨_⟩_
 infix 3 _∎
 
 data _—↠_ : Term → Term → Set where
   _∎ : ∀ M → M —↠ M
-  _—↠⟨_⟩_ : ∀ L {M N} → L —→ M → M —↠ N → L —↠ N
+  _—→⟨_⟩_ : ∀ L {M N} → L —→ M → M —↠ N → L —↠ N
 
 begin_ : ∀ {M N} → M —↠ N → M —↠ N
 begin_ M—↠N = M—↠N
@@ -233,7 +233,7 @@ open import part1.Isomorphism using (_≲_)
 
 —↠-trans : ∀ {L M N} → L —↠ M → M —↠ N → L —↠ N
 —↠-trans (_ ∎) h = h
-—↠-trans (_ —↠⟨ f ⟩ g) h = _ —↠⟨ f ⟩ —↠-trans g h
+—↠-trans (_ —→⟨ f ⟩ g) h = _ —→⟨ f ⟩ —↠-trans g h
 
 —↠≲—↠′ : ∀ {M N} → M —↠ N ≲ M —↠′ N
 —↠≲—↠′ =
@@ -245,14 +245,14 @@ open import part1.Isomorphism using (_≲_)
   where
     to′ : ∀ {M N} → M —↠ N → M —↠′ N
     to′ (_ ∎) = refl′
-    to′ (_ —↠⟨ g ⟩ h) = trans′ (step′ g) (to′ h)
+    to′ (_ —→⟨ g ⟩ h) = trans′ (step′ g) (to′ h)
     from′ : ∀ {M N} → M —↠′ N → M —↠ N
-    from′ (step′ x) = _ —↠⟨ x ⟩ _ ∎
+    from′ (step′ x) = _ —→⟨ x ⟩ _ ∎
     from′ refl′ = _ ∎
     from′ (trans′ g h) = —↠-trans (from′ g) (from′ h)
     ft-identity : ∀ {A B} (x : A —↠ B) → from′ (to′ x) ≡ x
     ft-identity (_ ∎) = refl
-    ft-identity (_ —↠⟨ _ ⟩ A—↠B) rewrite ft-identity A—↠B = refl
+    ft-identity (_ —→⟨ _ ⟩ A—↠B) rewrite ft-identity A—↠B = refl
 
 postulate
   confluence : ∀ {L M N} → ((L —↠ M) × (L —↠ N)) → ∃[ P ] ((M —↠ P) × (N —↠ P))
