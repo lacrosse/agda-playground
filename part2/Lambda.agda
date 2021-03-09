@@ -394,3 +394,84 @@ Context-≃ =
     tf-identity : ∀ (xs : List (Id × Type)) → to (from xs) ≡ xs
     tf-identity [] = refl
     tf-identity ((id , type) ∷ xs) rewrite tf-identity xs = refl
+
+-- Lookup
+
+infix 4 _∋_⦂_
+data _∋_⦂_ : Context → Id → Type → Set where
+  Z : ∀ {Γ x A} → Γ , x ⦂ A ∋ x ⦂ A
+  S : ∀ {Γ x y A B} → x ≢ y → Γ ∋ x ⦂ A → Γ , y ⦂ B ∋ x ⦂ A
+
+S′ : ∀ {Γ x y A B} → {x≢y : False (x ≟ y)} → Γ ∋ x ⦂ A → Γ , y ⦂ B ∋ x ⦂ A
+
+S′ {x≢y = x≢y} x = S (toWitnessFalse x≢y) x
+
+-- Typing
+
+infix 4 _⊢_⦂_
+data _⊢_⦂_ : Context → Term → Type → Set where
+  -- Axiom
+  ⊢` : ∀ {Γ x A}
+    → Γ ∋ x ⦂ A
+    → Γ ⊢ ` x ⦂ A
+  -- ⇒-I
+  ⊢ƛ : ∀ {Γ x N A B}
+    → Γ , x ⦂ A ⊢ N ⦂ B
+    → Γ ⊢ ƛ x ⇒ N ⦂ A ⇒ B
+  -- ⇒-E
+  _·_ : ∀ {Γ L M A B}
+    → Γ ⊢ L ⦂ A ⇒ B
+    → Γ ⊢ M ⦂ A
+    → Γ ⊢ L · M ⦂ B
+  -- ℕ-I₁
+  ⊢zero : ∀ {Γ}
+    → Γ ⊢ `zero ⦂ `ℕ
+  -- ℕ-I₂
+  ⊢suc : ∀ {Γ M}
+    → Γ ⊢ M ⦂ `ℕ
+    → Γ ⊢ `suc M ⦂ `ℕ
+  -- ℕ-E
+  ⊢case : ∀ {Γ L M x N A}
+    → Γ ⊢ L ⦂ `ℕ
+    → Γ ⊢ M ⦂ A
+    → Γ , x ⦂ `ℕ ⊢ N ⦂ A
+    → Γ ⊢ case L [zero⇒ M |suc x ⇒ N ] ⦂ A
+  ⊢μ : ∀ {Γ x M A}
+    → Γ , x ⦂ A ⊢ M ⦂ A
+    → Γ ⊢ μ x ⇒ M ⦂ A
+
+Ch : Type → Type
+Ch A = (A ⇒ A) ⇒ A ⇒ A
+
+⊢twoᶜ : ∀ {Γ A} → Γ ⊢ twoᶜ ⦂ Ch A
+⊢twoᶜ = ⊢ƛ (⊢ƛ (⊢` (S′ Z) · (⊢` (S′ Z) · ⊢` Z)))
+
+⊢two : ∀ {Γ} → Γ ⊢ two ⦂ `ℕ
+⊢two = ⊢suc (⊢suc ⊢zero)
+
+⊢plus : ∀ {Γ} → Γ ⊢ plus ⦂ `ℕ ⇒ `ℕ ⇒ `ℕ
+⊢plus = ⊢μ (⊢ƛ (⊢ƛ (⊢case (⊢` (S′ Z)) (⊢` Z) (⊢suc (⊢` (S′ (S′ (S′ Z))) · ⊢` Z · ⊢` (S′ Z))))))
+
+⊢2+2 : ∅ ⊢ plus · two · two ⦂ `ℕ
+⊢2+2 = ⊢plus · ⊢two · ⊢two
+
+⊢sucᶜ : ∅ ⊢ sucᶜ ⦂ `ℕ ⇒ `ℕ
+⊢sucᶜ = ⊢ƛ (⊢suc (⊢` Z))
+
+∋-injective : ∀ {Γ x A B} → Γ ∋ x ⦂ A → Γ ∋ x ⦂ B → A ≡ B
+∋-injective Z Z = refl
+∋-injective Z (S x≢x _) = ⊥-elim (x≢x refl)
+∋-injective (S x≢x _) Z = ⊥-elim (x≢x refl)
+∋-injective (S _ g) (S _ h) = ∋-injective g h
+
+nope₁ : ∀ {A} → ¬ (∅ ⊢ `zero · `suc `zero ⦂ A)
+nope₁ (() · _)
+
+-- Quiz
+-- *
+--  1. `ℕ
+--  2. impossible: requires "x" to be typed as (`ℕ ⇒ `ℕ) ⇒ B
+--  3. `ℕ ⇒ `ℕ (same as y)
+-- *
+--  1. impossible: requires A ≡ A ⇒ B
+--  2. B ≡ D ⇒ E; A ≡ E ⇒ F; C ≡ D ⇒ F
