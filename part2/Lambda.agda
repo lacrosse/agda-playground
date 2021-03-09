@@ -352,3 +352,12 @@ _ =
   —→⟨ ξ-suc β-zero ⟩
     two
   ∎
+
+infixr 7 _⇒_
+
+data Type : Set where
+  _⇒_ : Type → Type → Type
+  `ℕ : Type
+
+-- Quiz
+-- Answers: 2, 6
