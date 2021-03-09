@@ -43,8 +43,11 @@ data Term : Set where
   case_[zero⇒_|suc_⇒_] : Term → Term → Id → Term → Term
   μ_⇒_ : Id → Term → Term
 
+one : Term
+one = `suc `zero
+
 two : Term
-two = `suc `suc `zero
+two = `suc one
 
 plus : Term
 plus =
@@ -196,14 +199,29 @@ _[_:=_]′ (case L [zero⇒ M |suc x ⇒ N ]) y V
 infix 4 _—→_
 
 data _—→_ : Term → Term → Set where
-  ξ-·₁ : ∀ {L L′ M} → L —→ L′ → L · M —→ L′ · M
-  ξ-·₂ : ∀ {V M M′} → Value V → M —→ M′ → V · M —→ V · M′
-  β-ƛ : ∀ {x N V} → Value V → (ƛ x ⇒ N) · V —→ N [ x := V ]
-  ξ-suc : ∀ {M M′} → M —→ M′ → `suc M —→ `suc M′
-  ξ-case : ∀ {x L L′ M N} → L —→ L′ → case L [zero⇒ M |suc x ⇒ N ] —→ case L′ [zero⇒ M |suc x ⇒ N ]
-  β-zero : ∀ {x M N} → case `zero [zero⇒ M |suc x ⇒ N ] —→ M
-  β-suc : ∀ {x V M N} → Value V → case `suc V [zero⇒ M |suc x ⇒ N ] —→ N [ x := V ]
-  β-μ : ∀ {x M} → μ x ⇒ M —→ M [ x := μ x ⇒ M ]
+  ξ-·₁ : ∀ {L L′ M}
+    → L —→ L′
+    → L · M —→ L′ · M
+  ξ-·₂ : ∀ {V M M′}
+    → Value V
+    → M —→ M′
+    → V · M —→ V · M′
+  β-ƛ : ∀ {x N V}
+    → Value V
+    → (ƛ x ⇒ N) · V —→ N [ x := V ]
+  ξ-suc : ∀ {M M′}
+    → M —→ M′
+    → `suc M —→ `suc M′
+  ξ-case : ∀ {x L L′ M N}
+    → L —→ L′
+    → case L [zero⇒ M |suc x ⇒ N ] —→ case L′ [zero⇒ M |suc x ⇒ N ]
+  β-zero : ∀ {x M N}
+    → case `zero [zero⇒ M |suc x ⇒ N ] —→ M
+  β-suc : ∀ {x V M N}
+    → Value V
+    → case `suc V [zero⇒ M |suc x ⇒ N ] —→ N [ x := V ]
+  β-μ : ∀ {x M}
+    → μ x ⇒ M —→ M [ x := μ x ⇒ M ]
 
 -- Quiz
 -- Answers: 1, 2, 2
@@ -258,3 +276,79 @@ postulate
   confluence : ∀ {L M N} → ((L —↠ M) × (L —↠ N)) → ∃[ P ] ((M —↠ P) × (N —↠ P))
   diamond : ∀ {L M N} → ((L —→ M) × (L —→ N)) → ∃[ P ] ((M —↠ P) × (N —↠ P))
   deterministic : ∀ {L M N} → L —→ M → L —→ N → M ≡ N
+
+-- Examples
+
+_ : twoᶜ · sucᶜ · `zero —↠ `suc `suc `zero
+_ =
+  begin
+    twoᶜ · sucᶜ · `zero
+  —→⟨ ξ-·₁ (β-ƛ V-ƛ) ⟩
+    (ƛ "z" ⇒ sucᶜ · (sucᶜ · ` "z")) · `zero
+  —→⟨ β-ƛ V-zero ⟩
+    sucᶜ · (sucᶜ · `zero)
+  —→⟨ ξ-·₂ V-ƛ (β-ƛ V-zero) ⟩
+    sucᶜ · `suc `zero
+  —→⟨ β-ƛ (V-suc V-zero) ⟩
+    `suc `suc `zero
+  ∎
+
+_ : plus · two · two —↠ `suc `suc `suc `suc `zero
+_ =
+  begin
+    plus · two · two
+  —→⟨ ξ-·₁ (ξ-·₁ β-μ) ⟩
+    (ƛ "m" ⇒ ƛ "n" ⇒ case ` "m" [zero⇒ ` "n" |suc "m" ⇒ `suc (plus · ` "m" · ` "n")]) · two · two
+  —→⟨ ξ-·₁ (β-ƛ (V-suc (V-suc V-zero))) ⟩
+    (ƛ "n" ⇒ case two [zero⇒ ` "n" |suc "m" ⇒ `suc (plus · ` "m" · ` "n")]) · two
+  —→⟨ β-ƛ (V-suc (V-suc V-zero)) ⟩
+    case two [zero⇒ two |suc "m" ⇒ `suc (plus · ` "m" · two)]
+  —→⟨ β-suc (V-suc V-zero) ⟩
+    `suc (plus · `suc `zero · two)
+  —→⟨ ξ-suc (ξ-·₁ (ξ-·₁ β-μ)) ⟩
+    `suc ((ƛ "m" ⇒ ƛ "n" ⇒ case ` "m" [zero⇒ ` "n" |suc "m" ⇒ `suc (plus · ` "m" · ` "n") ]) · `suc `zero · two)
+  —→⟨ ξ-suc (ξ-·₁ (β-ƛ (V-suc V-zero))) ⟩
+    `suc ((ƛ "n" ⇒ case `suc `zero [zero⇒ ` "n" |suc "m" ⇒ `suc (plus · ` "m" · ` "n") ]) · two)
+  —→⟨ ξ-suc (β-ƛ (V-suc (V-suc V-zero))) ⟩
+    `suc (case `suc `zero [zero⇒ two |suc "m" ⇒ `suc (plus · ` "m" · two) ])
+  —→⟨ ξ-suc (β-suc V-zero) ⟩
+    `suc `suc (plus · `zero · two)
+  —→⟨ ξ-suc (ξ-suc (ξ-·₁ (ξ-·₁ β-μ))) ⟩
+    `suc `suc ((ƛ "m" ⇒ ƛ "n" ⇒ case ` "m" [zero⇒ ` "n" |suc "m" ⇒ `suc (plus · ` "m" · ` "n") ]) · `zero · two)
+  —→⟨ ξ-suc (ξ-suc (ξ-·₁ (β-ƛ V-zero))) ⟩
+    `suc `suc ((ƛ "n" ⇒ case `zero [zero⇒ ` "n" |suc "m" ⇒ `suc (plus · ` "m" · ` "n") ]) · two)
+  —→⟨ ξ-suc (ξ-suc (β-ƛ (V-suc (V-suc V-zero)))) ⟩
+    `suc `suc (case `zero [zero⇒ two |suc "m" ⇒ `suc (plus · ` "m" · two) ])
+  —→⟨ ξ-suc (ξ-suc β-zero) ⟩
+    `suc (`suc (`suc (`suc `zero)))
+  ∎
+
+-- Exercise
+
+_ : plus · one · one —↠ two
+_ =
+  begin
+    plus · one · one
+  —→⟨ ξ-·₁ (ξ-·₁ β-μ) ⟩
+    (ƛ "m" ⇒ ƛ "n" ⇒ case ` "m" [zero⇒ ` "n" |suc "m" ⇒ `suc (plus · ` "m" · ` "n") ]) · one · one
+  —→⟨ ξ-·₁ (β-ƛ (V-suc V-zero)) ⟩
+    (ƛ "n" ⇒ case one [zero⇒ ` "n" |suc "m" ⇒ `suc (plus · ` "m" · ` "n") ]) · one
+  —→⟨ β-ƛ (V-suc V-zero) ⟩
+    case one [zero⇒ one |suc "m" ⇒ `suc (plus · ` "m" · one) ]
+  —→⟨ β-suc V-zero ⟩
+    `suc (plus · `zero · one)
+  —→⟨ ξ-suc (ξ-·₁ (ξ-·₁ β-μ)) ⟩
+    `suc (
+      (ƛ "m" ⇒ ƛ "n" ⇒ case ` "m" [zero⇒ ` "n" |suc "m" ⇒ `suc (plus · ` "m" · ` "n") ]) · `zero · one
+    )
+  —→⟨ ξ-suc (ξ-·₁ (β-ƛ V-zero)) ⟩
+    `suc (
+      (ƛ "n" ⇒ case `zero [zero⇒ ` "n" |suc "m" ⇒ `suc (plus · ` "m" · ` "n") ]) · one
+    )
+  —→⟨ ξ-suc (β-ƛ (V-suc V-zero)) ⟩
+    `suc (
+      case `zero [zero⇒ one |suc "m" ⇒ `suc (plus · ` "m" · one) ]
+    )
+  —→⟨ ξ-suc β-zero ⟩
+    two
+  ∎
