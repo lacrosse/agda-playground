@@ -361,3 +361,36 @@ data Type : Set where
 
 -- Quiz
 -- Answers: 2, 6
+
+infixl 5 _,_⦂_
+
+data Context : Set where
+  ∅ : Context
+  _,_⦂_ : Context → Id → Type → Context
+
+-- Exercise Context-≃
+
+open part1.Isomorphism using (_≃_)
+open Data.Product using (_,_)
+
+Context-≃ : Context ≃ List (Id × Type)
+Context-≃ =
+  record
+    { to = to
+    ; from = from
+    ; from∘to = ft-identity
+    ; to∘from = tf-identity
+    }
+  where
+    to : Context → List (Id × Type)
+    to ∅ = []
+    to (c , id ⦂ type) = (id , type) ∷ (to c)
+    from : List (Id × Type) → Context
+    from [] = ∅
+    from ((id , type) ∷ xs) = (from xs) , id ⦂ type
+    ft-identity : ∀ (c : Context) → from (to c) ≡ c
+    ft-identity ∅ = refl
+    ft-identity (c , id ⦂ type) rewrite ft-identity c = refl
+    tf-identity : ∀ (xs : List (Id × Type)) → to (from xs) ≡ xs
+    tf-identity [] = refl
+    tf-identity ((id , type) ∷ xs) rewrite tf-identity xs = refl
