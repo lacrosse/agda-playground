@@ -85,7 +85,7 @@ mul =
 mulᶜ : Term
 mulᶜ =
   ƛ "m" ⇒ ƛ "n" ⇒ ƛ "s" ⇒ ƛ "z" ⇒
-  ` "m" · (ƛ "acc" ⇒ plusᶜ · ` "n" · ` "acc" · sucᶜ · ` "z") · ` "z"
+  ` "m" · (ƛ "acc" ⇒ ` "n" · ` "s" · ` "acc") · ` "z"
 
 -- Exercise primed
 
@@ -517,6 +517,32 @@ nope₁ (() · _)
               ⊢` (S′ Z)
             )
           )
+      )
+    )
+  )
+
+-- Exercise ⊢mulᶜ
+
+⊢mulᶜ : ∀ {Γ A} → Γ ⊢ mulᶜ ⦂ Ch A ⇒ Ch A ⇒ Ch A
+⊢mulᶜ =
+  ⊢ƛ (
+    ⊢ƛ (
+      ⊢ƛ (
+        ⊢ƛ (
+          (⊢` (S′ (S′ (S′ Z))))
+          ·
+          ⊢ƛ (
+            (
+              ⊢` (S′ (S′ (S′ Z)))
+              ·
+              ⊢` (S′ (S′ Z))
+              ·
+              ⊢` Z
+            )
+          )
+          ·
+          ⊢` Z
+        )
       )
     )
   )
