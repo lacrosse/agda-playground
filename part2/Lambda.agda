@@ -253,3 +253,8 @@ open import part1.Isomorphism using (_≲_)
     ft-identity : ∀ {A B} (x : A —↠ B) → from′ (to′ x) ≡ x
     ft-identity (_ ∎) = refl
     ft-identity (_ —↠⟨ _ ⟩ A—↠B) rewrite ft-identity A—↠B = refl
+
+postulate
+  confluence : ∀ {L M N} → ((L —↠ M) × (L —↠ N)) → ∃[ P ] ((M —↠ P) × (N —↠ P))
+  diamond : ∀ {L M N} → ((L —→ M) × (L —→ N)) → ∃[ P ] ((M —↠ P) × (N —↠ P))
+  deterministic : ∀ {L M N} → L —→ M → L —→ N → M ≡ N
