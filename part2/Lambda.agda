@@ -226,3 +226,30 @@ data _—↠′_ : Term → Term → Set where
   step′ : ∀ {M N} → M —→ N → M —↠′ N
   refl′ : ∀ {M} → M —↠′ M
   trans′ : ∀ {L M N} → L —↠′ M → M —↠′ N → L —↠′ N
+
+-- Exercise
+
+open import part1.Isomorphism using (_≲_)
+
+—↠-trans : ∀ {L M N} → L —↠ M → M —↠ N → L —↠ N
+—↠-trans (_ ∎) h = h
+—↠-trans (_ —↠⟨ f ⟩ g) h = _ —↠⟨ f ⟩ —↠-trans g h
+
+—↠≲—↠′ : ∀ {M N} → M —↠ N ≲ M —↠′ N
+—↠≲—↠′ =
+  record
+    { to = to′
+    ; from = from′
+    ; from∘to = ft-identity
+    }
+  where
+    to′ : ∀ {M N} → M —↠ N → M —↠′ N
+    to′ (_ ∎) = refl′
+    to′ (_ —↠⟨ g ⟩ h) = trans′ (step′ g) (to′ h)
+    from′ : ∀ {M N} → M —↠′ N → M —↠ N
+    from′ (step′ x) = _ —↠⟨ x ⟩ _ ∎
+    from′ refl′ = _ ∎
+    from′ (trans′ g h) = —↠-trans (from′ g) (from′ h)
+    ft-identity : ∀ {A B} (x : A —↠ B) → from′ (to′ x) ≡ x
+    ft-identity (_ ∎) = refl
+    ft-identity (_ —↠⟨ _ ⟩ A—↠B) rewrite ft-identity A—↠B = refl
