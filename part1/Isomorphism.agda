@@ -8,9 +8,10 @@ open import Data.Nat.Properties using (+-comm)
 
 -- Function composition
 
-_∘_ : ∀ {A B C : Set} → (B → C) → (A → B) → A → C
-g ∘ f = λ x → g (f x)
-infixr 1 _∘_
+open import Function using (_∘_)
+-- _∘_ : ∀ {A B C : Set} → (B → C) → (A → B) → A → C
+-- g ∘ f = λ x → g (f x)
+-- infixr 1 _∘_
 
 -- Extensionality
 
